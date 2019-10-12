@@ -47,6 +47,9 @@ window.onload = function(){
         paddleRightEdgeX >= ballX - radius)
     {
        speedY = -Math.abs(speedY);
+       const paddleCenter = paddleX + paddleWidth/2;
+       const ballDistFromPaddleCenterX = ballX - paddleCenter;
+       speedX = ballDistFromPaddleCenterX * 0.35;
     }
   }
 
