@@ -17,6 +17,12 @@ window.onload = function(){
   let paddleX = canvas.width/2 - paddleWidth/2;
   let paddleY = canvas.height - paddleHeight - 20;
 
+  // Brick Params
+  const brickHeight = 20;
+  const brickWeight = 100;
+  const bricksCount = Math.floor(canvas.width/brickWeight);
+  const hiddenBricks = new Set();
+
   animation(update);
   window.addEventListener('mousemove', updateMouseMove);
 
@@ -57,6 +63,7 @@ window.onload = function(){
     ballX = canvas.width/2;
     ballY = canvas.height/2;
     speedY = Math.abs(speedY);
+    speedX = initSpeedX;
   }
 
   function drawAll(){
@@ -66,6 +73,22 @@ window.onload = function(){
     drawBall(ballX, ballY, radius, 'white');
     //paddle
     drawRect(paddleX, paddleY, paddleWidth, paddleHeight, 'white');
+    drawBricks();
+  }
+
+  function drawBricks(){
+    let i = 0;
+    let brickX = i*brickWeight;
+    let brickY = 0;
+    if (hiddenBricks.size === bricksCount) return;
+    while(brickX + brickWeight <= canvas.width){
+      checkCollisionBallWithBricks(i, brickX, brickY, brickWeight - 2, brickHeight);
+      if (!hiddenBricks.has(i)) {
+        drawRect(brickX, brickY, brickWeight - 2, brickHeight, 'blue');
+      }
+      i++;
+      brickX = i*brickWeight
+    }
   }
 
   function drawRect(top, left, width, height, color){
@@ -97,5 +120,15 @@ window.onload = function(){
     //let mouseY = e.clientY - rect.top - pageYOffset
 
     paddleX = mouseX - paddleWidth/2;
+  }
+
+  function checkCollisionBallWithBricks(index, x, y, weight, height) {
+
+    if (
+      x <= ballX + radius && x + weight >= ballX - radius &&
+      y <= ballY + radius && y + height >= ballY - radius
+    ) {
+          hiddenBricks.add(index)
+    }
   }
 }
