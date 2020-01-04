@@ -22,6 +22,8 @@ window.onload = function(){
   const brickWeight = 100;
   const bricksCount = Math.floor(canvas.width/brickWeight);
   const hiddenBricks = new Set();
+  const brickImg = new Image();
+  brickImg.src = 'img/brick.png';
 
   animation(update);
   window.addEventListener('mousemove', updateMouseMove);
@@ -84,7 +86,7 @@ window.onload = function(){
     while(brickX + brickWeight <= canvas.width){
       checkCollisionBallWithBricks(i, brickX, brickY, brickWeight - 2, brickHeight);
       if (!hiddenBricks.has(i)) {
-        drawRect(brickX, brickY, brickWeight - 2, brickHeight, 'blue');
+        drawBrick(brickX, brickY, brickWeight - 2, brickHeight);
       }
       i++;
       brickX = i*brickWeight
@@ -94,6 +96,10 @@ window.onload = function(){
   function drawRect(top, left, width, height, color){
     ctx.fillStyle = color;
     ctx.fillRect(top, left, width, height);
+  }
+
+  function drawBrick(x, y, width, height) {
+    ctx.drawImage(brickImg, x, y, width, height);
   }
 
   function drawBall(ballX, ballY, radius, color){
