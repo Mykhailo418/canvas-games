@@ -33,10 +33,12 @@ gameScene.create = function() {
   this.player = addPlayer(this);
   this.gold = addGold(this);
 
-  this.enemies = [];
+  // Create group of enemies
+  addEnemiesGroup(this);
+  /*this.enemies = [];
   for (let i = 0; i < 3; i++) {
     this.enemies.push(addEnemy(this, i));
-  }
+  }*/
 
 }
 
@@ -48,7 +50,9 @@ gameScene.update = function() {
     this.player.x = Math.min(this.player.x + this.playerSpeed, width - this.player.displayWidth/2);
   }
 
-  moveEnemy(this);
+  this.enemies.getChildren().forEach(enemy => {
+    moveEnemy(enemy);
+  });
 
   // check if gold overlap player
   const playerRect = this.player.getBounds();
@@ -86,6 +90,25 @@ function addPlayer(scene) {
   return player;
 }
 
+function addEnemiesGroup(scene) {
+  scene.enemies = scene.add.group({
+    key: ASSESTS.enemy,
+    repeat: 2,
+    setXY: {
+      x: 200,
+      y: 250,
+      stepX: 150
+    }
+  });
+  // 1 - 0.8 = 0.2
+  Phaser.Actions.ScaleXY(scene.enemies.getChildren(), -0.8, -0.8);
+  Phaser.Actions.Call(scene.enemies.getChildren(), enemy => {
+    enemy.flipX = true;
+    enemy.depth = 1;
+    enemy.speed = ENEMY_SPEED_MIN + Math.random() * (ENEMY_SPEED_MAX - ENEMY_SPEED_MIN);
+  }, scene);
+}
+
 function addEnemy(scene, index) {
   const enemy = scene.add.sprite(200 + index*150, 250, ASSESTS.enemy);
   enemy.scaleX = 0.2;
@@ -107,13 +130,11 @@ function addGold(scene) {
   return gold;
 }
 
-function moveEnemy(scene) {
-  scene.enemies.forEach(enemy => {
-    enemy.sprite.y += enemy.speed;
-    const conditionUp = enemy.speed < 0 && enemy.sprite.y <= ENEMY_MIN_Y;
-    const conditionDown = enemy.speed > 0 && enemy.sprite.y >= ENEMY_MAX_Y;
-    if (conditionUp || conditionDown) {
-      enemy.speed *= -1;
-    }
-  });
+function moveEnemy(enemy) {
+  enemy.y += enemy.speed;
+  const conditionUp = enemy.speed < 0 && enemy.y <= ENEMY_MIN_Y;
+  const conditionDown = enemy.speed > 0 && enemy.y >= ENEMY_MAX_Y;
+  if (conditionUp || conditionDown) {
+    enemy.speed *= -1;
+  }
 }
