@@ -11,7 +11,7 @@ const gameScene = new Phaser.Scene('Game');
 
 // Initial Params
 gameScene.init =  function() {
-  this.playerSpeed = 2;
+  this.playerSpeed = 3;
 }
 
 // Load Assets
@@ -36,6 +36,14 @@ gameScene.update = function() {
   // check for active input
   if (this.input.activePointer.isDown) {
     this.player.x = Math.min(this.player.x + this.playerSpeed, width - this.player.displayWidth/2);
+  }
+
+  // check if gold overlap player
+  const playerRect = this.player.getBounds();
+  const goldRect = this.gold.getBounds();
+  if (Phaser.Geom.Intersects.RectangleToRectangle(playerRect, goldRect)) {
+    this.scene.restart();
+    return;
   }
 }
 
