@@ -5,6 +5,11 @@ const ASSESTS = {
   enemy: 'enemy',
   gold: 'gold',
 }
+const ENEMY_SPEED_MAX = 5;
+const ENEMY_SPEED_MIN = 1;
+const ENEMY_MAX_Y = 250;
+const ENEMY_MIN_Y = 80;
+
 
 // Create new scene
 const gameScene = new Phaser.Scene('Game');
@@ -26,8 +31,13 @@ gameScene.preload = function() {
 gameScene.create = function() {
   addBackground(this);
   this.player = addPlayer(this);
-  this.enemy = addEnemy(this);
   this.gold = addGold(this);
+
+  this.enemies = [];
+  for (let i = 0; i < 3; i++) {
+    this.enemies.push(addEnemy(this, i));
+  }
+
 }
 
 // Called upto 60 times per second
@@ -37,6 +47,8 @@ gameScene.update = function() {
   if (this.input.activePointer.isDown) {
     this.player.x = Math.min(this.player.x + this.playerSpeed, width - this.player.displayWidth/2);
   }
+
+  moveEnemy(this);
 
   // check if gold overlap player
   const playerRect = this.player.getBounds();
@@ -74,13 +86,16 @@ function addPlayer(scene) {
   return player;
 }
 
-function addEnemy(scene) {
-  const enemy = scene.add.sprite(200, 250, ASSESTS.enemy);
+function addEnemy(scene, index) {
+  const enemy = scene.add.sprite(200 + index*150, 250, ASSESTS.enemy);
   enemy.scaleX = 0.2;
   enemy.scaleY = 0.2;
   enemy.flipX = true;
   enemy.depth = 1;
-  return enemy;
+  return {
+    sprite: enemy,
+    speed: ENEMY_SPEED_MIN + Math.random() * (ENEMY_SPEED_MAX - ENEMY_SPEED_MIN),
+  };
 }
 
 function addGold(scene) {
@@ -90,4 +105,15 @@ function addGold(scene) {
   gold.setPosition(width - gold.displayWidth/2 - 5, 270);
   gold.depth = 1;
   return gold;
+}
+
+function moveEnemy(scene) {
+  scene.enemies.forEach(enemy => {
+    enemy.sprite.y += enemy.speed;
+    const conditionUp = enemy.speed < 0 && enemy.sprite.y <= ENEMY_MIN_Y;
+    const conditionDown = enemy.speed > 0 && enemy.sprite.y >= ENEMY_MAX_Y;
+    if (conditionUp || conditionDown) {
+      enemy.speed *= -1;
+    }
+  });
 }
