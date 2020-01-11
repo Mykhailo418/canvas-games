@@ -9,6 +9,9 @@ const ENEMY_SPEED_MAX = 5;
 const ENEMY_SPEED_MIN = 1;
 const ENEMY_MAX_Y = 250;
 const ENEMY_MIN_Y = 80;
+const EFFECT_DURATION = 500;
+
+let isTerminating;
 
 
 // Create new scene
@@ -17,6 +20,7 @@ const gameScene = new Phaser.Scene('Game');
 // Initial Params
 gameScene.init =  function() {
   this.playerSpeed = 3;
+  isTerminating = false;
 }
 
 // Load Assets
@@ -44,22 +48,28 @@ gameScene.create = function() {
 
 // Called upto 60 times per second
 gameScene.update = function() {
+  if(isTerminating) return;
+
   const {width} = this.sys.game.config;
+  const playerRect = this.player.getBounds();
+  const goldRect = this.gold.getBounds();
+
+  this.enemies.getChildren().forEach(enemy => {
+    const enemyRect = enemy.getBounds();
+    moveEnemy(enemy);
+    if (Phaser.Geom.Intersects.RectangleToRectangle(playerRect, enemyRect)) {
+      return gameOver(this);
+    }
+  });
+
   // check for active input
   if (this.input.activePointer.isDown) {
     this.player.x = Math.min(this.player.x + this.playerSpeed, width - this.player.displayWidth/2);
   }
 
-  this.enemies.getChildren().forEach(enemy => {
-    moveEnemy(enemy);
-  });
-
   // check if gold overlap player
-  const playerRect = this.player.getBounds();
-  const goldRect = this.gold.getBounds();
   if (Phaser.Geom.Intersects.RectangleToRectangle(playerRect, goldRect)) {
-    this.scene.restart();
-    return;
+    return gameWin(this);
   }
 }
 
@@ -100,8 +110,7 @@ function addEnemiesGroup(scene) {
       stepX: 150
     }
   });
-  // 1 - 0.8 = 0.2
-  Phaser.Actions.ScaleXY(scene.enemies.getChildren(), -0.8, -0.8);
+  Phaser.Actions.ScaleXY(scene.enemies.getChildren(), -0.8, -0.8); // 1 - 0.8 = 0.2
   Phaser.Actions.Call(scene.enemies.getChildren(), enemy => {
     enemy.flipX = true;
     enemy.depth = 1;
@@ -137,4 +146,23 @@ function moveEnemy(enemy) {
   if (conditionUp || conditionDown) {
     enemy.speed *= -1;
   }
+}
+
+function gameOver(scene) {
+  isTerminating = true;
+  scene.cameras.main.shake(EFFECT_DURATION, 0.01); // shaking camera effect
+  scene.cameras.main.once('camerashakecomplete', function(camera, effect) {
+    this.cameras.main.fade(EFFECT_DURATION); // fade out
+  }, scene);
+  scene.cameras.main.once('camerafadeoutcomplete', function(camera, effect) {
+    this.scene.restart();
+  }, scene);
+}
+
+function gameWin(scene) {
+  isTerminating = true;
+  scene.cameras.main.fade(EFFECT_DURATION);
+  scene.cameras.main.once('camerafadeoutcomplete', function(camera, effect) {
+    this.scene.restart();
+  }, scene);
 }
