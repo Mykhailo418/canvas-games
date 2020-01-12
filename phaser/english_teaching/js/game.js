@@ -6,7 +6,13 @@ const globals = {};
 const gameScene = new Phaser.Scene('Game');
 
 gameScene.init =  function() {
-
+  globals.words = {
+    [ASSESTS.wolf]: 'Wolf',
+    [ASSESTS.demon]: 'Demon',
+    [ASSESTS.frog]: 'Frog',
+    [ASSESTS.ghost]: 'Ghost',
+  };
+  globals.sounds = {};
 }
 gameScene.preload = function() {
   this.load.image(ASSESTS.wolf, 'img/wolf.png');
@@ -26,7 +32,8 @@ gameScene.create = function() {
     {
       key: ASSESTS.wolf,
       setXY: {x: 320, y: 100},
-      setScale: {x: 0.3, y: 0.3}
+      setScale: {x: 0.3, y: 0.3},
+      alpha: 0.7
     },
     {
       key: ASSESTS.demon,
@@ -47,27 +54,22 @@ gameScene.create = function() {
   globals.items.setDepth(1);
 
   Phaser.Actions.Call(globals.items.getChildren(), function(item) {
-    // make items interactive
-    item.setInteractive();
-    // create resize tween
-    const resizeTween = createResizeTween(this, item);
-    const transparencyTween = createTransparencyTween(this, item);
 
-    item.on('pointerdown', pointer => {
-      resizeTween.play();
-    });
-    item.on('pointerover', pointer => {
-      transparencyTween.play();
-    });
-    item.on('pointerout', pointer => {
-      transparencyTween.stop();
-      item.alpha = 1;
-    });
+    makeItemInteractive(item, this);
+
+    // setup sound for each word
+    globals.sounds[item.texture.key] = this.sound.add(item.texture.key);
   }, this);
-}
-gameScene.update = function() {
 
+  globals.sounds[ASSESTS.correct] = this.sound.add(ASSESTS.correct);
+  globals.sounds[ASSESTS.wrong] = this.sound.add(ASSESTS.wrong);
+
+  // create text Object
+  displayText(this);
+
+  showNextWord(this);
 }
+gameScene.update = function() {}
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -78,6 +80,29 @@ const game = new Phaser.Game({
   pixelArt: false // turn of pixel perfect, pixels would be blended
 });
 
+function makeItemInteractive(item, scene) {
+  // create tweens
+  const resizeTween = createResizeTween(scene, item);
+  const transparencyTween = createTransparencyTween(scene, item);
+
+  // make items interactive
+  item.setInteractive();
+
+  item.on('pointerdown', pointer => {
+    if (processAnswer(item)) {
+      resizeTween.play();
+      showNextWord(scene);
+    }
+  });
+  item.on('pointerover', pointer => {
+    transparencyTween.play();
+  });
+  item.on('pointerout', pointer => {
+    transparencyTween.stop();
+    item.alpha = 1;
+  });
+}
+
 function createResizeTween(scene, item) {
   return scene.tweens.add({
     targets: item,
@@ -85,7 +110,8 @@ function createResizeTween(scene, item) {
     scaleY: 0.5,
     duration: 300,
     paused: true, // pause at the beggining so it will not start anumation
-    yoyo: true, // will comback to initial state
+    yoyo: true, // will comback to initial state,
+    ease: 'Quad.easeInOut'
   });
 }
 
@@ -96,4 +122,42 @@ function createTransparencyTween(scene, item) {
     duration: 200,
     paused: true,
   });
+}
+
+function showNextWord(scene) {
+  // select a random word
+  globals.currentWord = Phaser.Math.RND.pick(Object.keys(globals.words));
+
+  // set text
+  globals.wordText.setText(globals.words[globals.currentWord]);
+}
+
+function displayText(scene) {
+  globals.wordText = scene.add.text(30, 20, '', {
+    fontSize: '28px',
+    color: '#fff',
+    cursor: 'pointer'
+  });
+  globals.wordText.setInteractive();
+  globals.wordText.on('pointerdown', pointer => {
+    globals.sounds[globals.currentWord].play();
+  });
+}
+
+function processAnswer(item) {
+  if (item.texture.key === globals.currentWord) {
+    playCorrectSound();
+    return true;
+  } else {
+    playWrongSound();
+    return false;
+  }
+}
+
+function playCorrectSound() {
+  globals.sounds[ASSESTS.correct].play();
+}
+
+function playWrongSound() {
+  globals.sounds[ASSESTS.wrong].play();
 }
