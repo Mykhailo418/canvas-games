@@ -10,6 +10,11 @@ gameScene.init = function() {
     health: 100,
     fun: 100
   }
+  globals.stats = {
+    [ASSESTS.apple]: {health: 20, fun: 0},
+    [ASSESTS.candy]: {health: -10, fun: 10},
+    [ASSESTS.toy]: {health: 0, fun: 20},
+  }
 };
 
 gameScene.preload = function() {
@@ -29,11 +34,15 @@ gameScene.preload = function() {
 gameScene.create = function() {
   this.add.image(0, 0, ASSESTS.bg).setOrigin(0, 0);
 
-  globals.pet = this.add.sprite(100, 200, ASSESTS.pet, 0)
-    .setOrigin(0)
-    .setScale(0.5);
+  addPet(this);
+  // follow pointer(mouse) when draging
+  scene.input.on('drag', (pointer, gameObject, drawX, drawY) => {
+    gameObject.x = drawX;
+    gameObject.y = drawY;
+  });
 
   addButtons(this);
+  addEventsToButtons();
 };
 
 gameScene.update = function() {
@@ -50,6 +59,16 @@ const game = new Phaser.Game({
   backgroundColor: 'ffffff'
 });
 
+function addPet(scene) {
+  globals.pet = scene.add.sprite(100, 200, ASSESTS.pet, 0)
+    .setOrigin(0)
+    .setScale(0.5)
+    .setInteractive();
+
+  // make pet draggable
+  scene.input.setDraggable(globals.pet);
+}
+
 function addButtons(scene) {
   globals.appleBtn = scene.add.sprite(42, 580, ASSESTS.apple)
     .setScale(0.4)
@@ -63,4 +82,20 @@ function addButtons(scene) {
   globals.rotateBtn = scene.add.sprite(318, 580, ASSESTS.rotate)
     .setScale(0.4)
   . setInteractive();
+}
+
+function addEventsToButtons() {
+  // !IMPORTANT: if not pass third argument, this inside function would be the current sprite
+  globals.appleBtn.on('pointerdown', pickItem);
+  globals.candyBtn.on('pointerdown', pickItem);
+  globals.toyBtn.on('pointerdown', pickItem);
+  globals.rotateBtn.on('pointerdown', rotatePet);
+}
+
+function pickItem() {
+
+}
+
+function rotatePet() {
+
 }
