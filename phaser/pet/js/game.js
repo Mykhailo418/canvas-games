@@ -1,20 +1,26 @@
 const ASSESTS = {
   toy: 'toy', apple: 'apple', bg: 'background', candy: 'candy', rotate: 'rotate', pet: 'pet'
 };
+const UI_STATES = {
+  ready: 'ready', selected: 'selected', blocked: 'blocked'
+};
 const globals = {};
 
 const gameScene = new Phaser.Scene('Game');
 
 gameScene.init = function() {
-  globals.state = {
+  globals.btns = {};
+  globals.petStats = {
     health: 100,
     fun: 100
-  }
+  };
   globals.stats = {
     [ASSESTS.apple]: {health: 20, fun: 0},
     [ASSESTS.candy]: {health: -10, fun: 10},
     [ASSESTS.toy]: {health: 0, fun: 20},
-  }
+  };
+  globals.uiState = UI_STATES.ready;
+  globals.selcetedItem = null;
 };
 
 gameScene.preload = function() {
@@ -36,7 +42,7 @@ gameScene.create = function() {
 
   addPet(this);
   // follow pointer(mouse) when draging
-  scene.input.on('drag', (pointer, gameObject, drawX, drawY) => {
+  this.input.on('drag', (pointer, gameObject, drawX, drawY) => {
     gameObject.x = drawX;
     gameObject.y = drawY;
   });
@@ -70,32 +76,56 @@ function addPet(scene) {
 }
 
 function addButtons(scene) {
-  globals.appleBtn = scene.add.sprite(42, 580, ASSESTS.apple)
+  globals.btns.apple = scene.add.sprite(42, 580, ASSESTS.apple)
     .setScale(0.4)
     .setInteractive();
-  globals.candyBtn = scene.add.sprite(134, 580, ASSESTS.candy)
+  globals.btns.candy = scene.add.sprite(134, 580, ASSESTS.candy)
     .setScale(0.45)
     .setInteractive();
-  globals.toyBtn = scene.add.sprite(226, 580, ASSESTS.toy)
+  globals.btns.toy = scene.add.sprite(226, 580, ASSESTS.toy)
     .setScale(0.45)
     .setInteractive();
-  globals.rotateBtn = scene.add.sprite(318, 580, ASSESTS.rotate)
+  globals.btns.rotate = scene.add.sprite(318, 580, ASSESTS.rotate)
     .setScale(0.4)
   . setInteractive();
 }
 
 function addEventsToButtons() {
   // !IMPORTANT: if not pass third argument, this inside function would be the current sprite
-  globals.appleBtn.on('pointerdown', pickItem);
-  globals.candyBtn.on('pointerdown', pickItem);
-  globals.toyBtn.on('pointerdown', pickItem);
-  globals.rotateBtn.on('pointerdown', rotatePet);
+  globals.btns.apple.on('pointerdown', pickItem);
+  globals.btns.candy.on('pointerdown', pickItem);
+  globals.btns.toy.on('pointerdown', pickItem);
+  globals.btns.rotate.on('pointerdown', rotatePet);
 }
 
 function pickItem() {
-
+  switch (globals.uiState) {
+    case UI_STATES.blocked: return;
+    case UI_STATES.selected: setUiReady();
+    case UI_STATES.ready:
+      globals.uiState = UI_STATES.selected;
+      globals.selcetedItem = this;
+      this.alpha = 0.5;
+      break;
+  }
 }
 
 function rotatePet() {
+  switch (globals.uiState) {
+    case UI_STATES.blocked: return;
+    case UI_STATES.selected: setUiReady();
+    case UI_STATES.ready:
+      globals.uiState = UI_STATES.blocked;
+      this.alpha = 0.5;
+      setTimeout(() => setUiReady(), 5000);
+      break;
+  }
+}
 
+function setUiReady() {
+  globals.uiState = UI_STATES.ready;
+  globals.selcetedItem = null;
+  Object.keys(globals.btns).forEach(btnKey => {
+    globals.btns[btnKey].alpha = 1;
+  });
 }
