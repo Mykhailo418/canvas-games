@@ -18,6 +18,7 @@ gameScene.init = function() {
     [ASSESTS.apple]: {health: 20, fun: 0},
     [ASSESTS.candy]: {health: -10, fun: 10},
     [ASSESTS.toy]: {health: 0, fun: 20},
+    [ASSESTS.rotate]: {health: 0, fun: 15}
   };
   globals.uiState = UI_STATES.ready;
   globals.selcetedItem = null;
@@ -75,19 +76,14 @@ function addBackground() {
     const newItem = createItem.bind(this)(selectedItemKey, localX, localY); // create new item and place it
 
     // change states of pet according items stats
-    Object.keys(globals.stats[selectedItemKey]).forEach(stat => {
-      if (globals.petStats.hasOwnProperty(stat)) {
-        globals.petStats[stat] += globals.stats[selectedItemKey][stat];
-      }
-    });
-    console.log(globals.petStats);
+    changePetStats(selectedItemKey);
+
     setUiReady();
   });
 }
 
 function addPet(scene) {
   globals.pet = scene.add.sprite(100, 200, ASSESTS.pet, 0)
-    .setOrigin(0)
     .setScale(0.5)
     .setInteractive();
 
@@ -124,7 +120,9 @@ function addEventsToButtons() {
 function pickItem() {
   switch (globals.uiState) {
     case UI_STATES.blocked: return;
-    case UI_STATES.selected: setUiReady();
+    case UI_STATES.selected:
+      if (globals.selcetedItem === this) return setUiReady();
+      else setUiReady();
     case UI_STATES.ready:
       globals.uiState = UI_STATES.selected;
       globals.selcetedItem = this;
@@ -140,7 +138,17 @@ function rotatePet() {
     case UI_STATES.ready:
       globals.uiState = UI_STATES.blocked;
       this.alpha = 0.5;
-      setTimeout(() => setUiReady(), 5000);
+      let rotateTween = this.scene.tweens.add({
+        targets: globals.pet,
+        duration: 1200,
+        angle: 720,
+        pause: false,
+        callbackScope: this.scene, // set context for example for 'onComplete' method
+        onComplete: function(tween, sprites) {
+          changePetStats(ASSESTS.rotate);
+          setUiReady();
+        }
+      });
       break;
   }
 }
@@ -150,5 +158,13 @@ function setUiReady() {
   globals.selcetedItem = null;
   Object.keys(globals.btns).forEach(btnKey => {
     globals.btns[btnKey].alpha = 1;
+  });
+}
+
+function changePetStats(key) {
+  Object.keys(globals.stats[key]).forEach(stat => {
+    if (globals.petStats.hasOwnProperty(stat)) {
+      globals.petStats[stat] += globals.stats[key][stat];
+    }
   });
 }
