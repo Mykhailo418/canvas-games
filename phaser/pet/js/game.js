@@ -4,6 +4,9 @@ const ASSESTS = {
 const UI_STATES = {
   ready: 'ready', selected: 'selected', blocked: 'blocked'
 };
+const ANIMS = {
+  eat: 'eat'
+};
 const globals = {};
 
 const gameScene = new Phaser.Scene('Game');
@@ -44,6 +47,7 @@ gameScene.create = function() {
 
   // follow pointer(mouse) when draging
   this.input.on('drag', (pointer, gameObject, drawX, drawY) => {
+    if (globals.uiState === UI_STATES.blocked) return;
     gameObject.x = drawX;
     gameObject.y = drawY;
   });
@@ -70,16 +74,7 @@ function addBackground() {
   let bg = this.add.image(0, 0, ASSESTS.bg)
     .setInteractive()
     .setOrigin(0, 0);
-  bg.on('pointerdown', (pointer, localX, localY) => {
-    if (!globals.selcetedItem) return;
-    const selectedItemKey =  globals.selcetedItem.texture.key;
-    const newItem = createItem.bind(this)(selectedItemKey, localX, localY); // create new item and place it
-
-    // change states of pet according items stats
-    changePetStats(selectedItemKey);
-
-    setUiReady();
-  });
+  bg.on('pointerdown', placeItem.bind(this));
 }
 
 function addPet(scene) {
@@ -89,6 +84,15 @@ function addPet(scene) {
 
   // make pet draggable
   scene.input.setDraggable(globals.pet);
+
+  // create animation to eat items
+  scene.anims.create({
+    key: ANIMS.eat,
+    frames: scene.anims.generateFrameNames(ASSESTS.pet, {frames: [1, 2, 3]}),
+    frameRet: 7,
+    yoyo: true,
+    repeat: 0, //to repeat forever: -1
+  });
 }
 
 function addButtons(scene) {
@@ -142,7 +146,7 @@ function rotatePet() {
         targets: globals.pet,
         duration: 1200,
         angle: 720,
-        pause: false,
+        paused: false,
         callbackScope: this.scene, // set context for example for 'onComplete' method
         onComplete: function(tween, sprites) {
           changePetStats(ASSESTS.rotate);
@@ -165,6 +169,34 @@ function changePetStats(key) {
   Object.keys(globals.stats[key]).forEach(stat => {
     if (globals.petStats.hasOwnProperty(stat)) {
       globals.petStats[stat] += globals.stats[key][stat];
+    }
+  });
+}
+
+function placeItem(pointer, localX, localY) {
+  if (!globals.selcetedItem || globals.uiState !== UI_STATES.selected) return;
+  const selectedItemKey =  globals.selcetedItem.texture.key;
+  const newItem = createItem.bind(this)(selectedItemKey, localX, localY); // create new item and place it
+
+  movePet.bind(this)(newItem, selectedItemKey);
+}
+
+function movePet(item, key) {
+  globals.uiState = UI_STATES.blocked;
+  let petMovementTween = this.tweens.add({
+    targets: globals.pet,
+    duration: 600,
+    x: item.x,
+    y: item.y,
+    paused: false,
+    onComplete: (tween, sprites) => {
+      item.destroy();
+      globals.pet.play(ANIMS.eat);
+      globals.pet.once('animationcomplete', () => {
+        globals.pet.setFrame(0);
+        changePetStats(key); // change states of pet according items stats
+        setUiReady();
+      });
     }
   });
 }
