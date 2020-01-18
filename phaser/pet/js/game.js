@@ -38,9 +38,9 @@ gameScene.preload = function() {
 };
 
 gameScene.create = function() {
-  this.add.image(0, 0, ASSESTS.bg).setOrigin(0, 0);
-
+  addBackground.bind(this)();
   addPet(this);
+
   // follow pointer(mouse) when draging
   this.input.on('drag', (pointer, gameObject, drawX, drawY) => {
     gameObject.x = drawX;
@@ -65,6 +65,26 @@ const game = new Phaser.Game({
   backgroundColor: 'ffffff'
 });
 
+function addBackground() {
+  let bg = this.add.image(0, 0, ASSESTS.bg)
+    .setInteractive()
+    .setOrigin(0, 0);
+  bg.on('pointerdown', (pointer, localX, localY) => {
+    if (!globals.selcetedItem) return;
+    const selectedItemKey =  globals.selcetedItem.texture.key;
+    const newItem = createItem.bind(this)(selectedItemKey, localX, localY); // create new item and place it
+
+    // change states of pet according items stats
+    Object.keys(globals.stats[selectedItemKey]).forEach(stat => {
+      if (globals.petStats.hasOwnProperty(stat)) {
+        globals.petStats[stat] += globals.stats[selectedItemKey][stat];
+      }
+    });
+    console.log(globals.petStats);
+    setUiReady();
+  });
+}
+
 function addPet(scene) {
   globals.pet = scene.add.sprite(100, 200, ASSESTS.pet, 0)
     .setOrigin(0)
@@ -76,22 +96,25 @@ function addPet(scene) {
 }
 
 function addButtons(scene) {
-  globals.btns.apple = scene.add.sprite(42, 580, ASSESTS.apple)
-    .setScale(0.4)
-    .setInteractive();
-  globals.btns.candy = scene.add.sprite(134, 580, ASSESTS.candy)
-    .setScale(0.45)
-    .setInteractive();
-  globals.btns.toy = scene.add.sprite(226, 580, ASSESTS.toy)
-    .setScale(0.45)
-    .setInteractive();
-  globals.btns.rotate = scene.add.sprite(318, 580, ASSESTS.rotate)
-    .setScale(0.4)
-  . setInteractive();
+  globals.btns.apple = createItem.bind(scene)(ASSESTS.apple, 42, 580).setInteractive();
+  globals.btns.candy = createItem.bind(scene)(ASSESTS.candy, 134, 580).setInteractive();
+  globals.btns.toy = createItem.bind(scene)(ASSESTS.toy, 226, 580).setInteractive();
+  globals.btns.rotate = createItem.bind(scene)(ASSESTS.rotate, 318, 580).setInteractive();
+}
+
+function createItem(key, x, y) {
+  const item = this.add.sprite(x, y, key);
+  switch (key) {
+    case ASSESTS.apple: item.setScale(0.4); break;
+    case ASSESTS.candy: item.setScale(0.45); break;
+    case ASSESTS.toy: item.setScale(0.45); break;
+    case ASSESTS.rotate: item.setScale(0.4); break;
+  }
+  return item;
 }
 
 function addEventsToButtons() {
-  // !IMPORTANT: if not pass third argument, this inside function would be the current sprite
+  // !IMPORTANT: if not pass third argument, 'this' inside function would be the current sprite
   globals.btns.apple.on('pointerdown', pickItem);
   globals.btns.candy.on('pointerdown', pickItem);
   globals.btns.toy.on('pointerdown', pickItem);
