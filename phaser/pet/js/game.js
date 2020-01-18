@@ -7,6 +7,7 @@ const UI_STATES = {
 const ANIMS = {
   eat: 'eat'
 };
+const statsDecayKey = 'statsDecay';
 const globals = {};
 
 const gameScene = new Phaser.Scene('Game');
@@ -21,7 +22,8 @@ gameScene.init = function() {
     [ASSESTS.apple]: {health: 20, fun: 0},
     [ASSESTS.candy]: {health: -10, fun: 10},
     [ASSESTS.toy]: {health: 0, fun: 20},
-    [ASSESTS.rotate]: {health: 0, fun: 15}
+    [ASSESTS.rotate]: {health: 0, fun: 15},
+    [statsDecayKey]: {health: -5, fun: -2}
   };
   globals.uiState = UI_STATES.ready;
   globals.selcetedItem = null;
@@ -56,7 +58,8 @@ gameScene.create = function() {
   addButtons(this);
   addEventsToButtons();
   showStatsText(this);
-  updateStatstext();
+  updateStatsText();
+  decreasePetStatsOverTime(this);
 };
 
 gameScene.update = function() {
@@ -169,12 +172,20 @@ function setUiReady() {
 }
 
 function changePetStats(key) {
+  let isGameOver = false;
   Object.keys(globals.stats[key]).forEach(stat => {
     if (globals.petStats.hasOwnProperty(stat)) {
       globals.petStats[stat] += globals.stats[key][stat];
+      if (globals.petStats[stat] <= 0) {
+        globals.petStats[stat] = 0;
+        isGameOver = true;
+      }
     }
   });
-  updateStatstext();
+  updateStatsText();
+  if (isGameOver) {
+    gameOver();
+  }
 }
 
 function placeItem(pointer, localX, localY) {
@@ -216,7 +227,22 @@ function showStatsText(scene) {
   })
 }
 
-function updateStatstext() {
+function updateStatsText() {
   globals.texts.health.setText(`Health: ${globals.petStats.health}`);
   globals.texts.fun.setText(`Fun: ${globals.petStats.fun}`);
+}
+
+function decreasePetStatsOverTime(scene) {
+  globals.timedEventStats = scene.time.addEvent({
+    delay: 1000,
+    repeat: -1, // will reapet forever
+    callback: () => {
+      changePetStats(statsDecayKey);
+      console.log('decay');
+    }
+  });
+}
+
+function gameOver() {
+
 }
