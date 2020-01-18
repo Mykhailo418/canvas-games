@@ -25,6 +25,7 @@ gameScene.init = function() {
   };
   globals.uiState = UI_STATES.ready;
   globals.selcetedItem = null;
+  globals.texts = {};
 };
 
 gameScene.preload = function() {
@@ -54,6 +55,8 @@ gameScene.create = function() {
 
   addButtons(this);
   addEventsToButtons();
+  showStatsText(this);
+  updateStatstext();
 };
 
 gameScene.update = function() {
@@ -171,6 +174,7 @@ function changePetStats(key) {
       globals.petStats[stat] += globals.stats[key][stat];
     }
   });
+  updateStatstext();
 }
 
 function placeItem(pointer, localX, localY) {
@@ -199,4 +203,20 @@ function movePet(item, key) {
       });
     }
   });
+}
+
+function showStatsText(scene) {
+  globals.texts.health = scene.add.text(20, 20, 'Health: ', {
+    font: '20px Arial',
+    fill: '#ffffff'
+  });
+  globals.texts.fun = scene.add.text(150, 20, 'Fun: ', {
+    font: '20px Arial',
+    fill: '#ffffff'
+  })
+}
+
+function updateStatstext() {
+  globals.texts.health.setText(`Health: ${globals.petStats.health}`);
+  globals.texts.fun.setText(`Fun: ${globals.petStats.fun}`);
 }
