@@ -11,6 +11,7 @@ const statsDecayKey = 'statsDecay';
 const globals = {};
 
 const gameScene = new Phaser.Scene('Game');
+let gameOverFunc;
 
 gameScene.init = function() {
   globals.btns = {};
@@ -28,6 +29,7 @@ gameScene.init = function() {
   globals.uiState = UI_STATES.ready;
   globals.selcetedItem = null;
   globals.texts = {};
+  gameOverFunc = () => gameOver(this);
 };
 
 gameScene.preload = function() {
@@ -184,7 +186,7 @@ function changePetStats(key) {
   });
   updateStatsText();
   if (isGameOver) {
-    gameOver();
+    gameOverFunc();
   }
 }
 
@@ -236,13 +238,19 @@ function decreasePetStatsOverTime(scene) {
   globals.timedEventStats = scene.time.addEvent({
     delay: 1000,
     repeat: -1, // will reapet forever
-    callback: () => {
-      changePetStats(statsDecayKey);
-      console.log('decay');
-    }
+    callback: () => changePetStats(statsDecayKey);
   });
 }
 
-function gameOver() {
+function gameOver(scene) {
+  globals.uiState = UI_STATES.blocked;
+  globals.pet.setFrame(4);
 
+  scene.time.addEvent({
+    delay: 2000,
+    repeat: 0,
+    callback: () => {
+      scene.scene.restart();
+    }
+  });
 }
