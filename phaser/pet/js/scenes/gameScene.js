@@ -1,16 +1,7 @@
-const ASSESTS = {
-  toy: 'toy', apple: 'apple', bg: 'background', candy: 'candy', rotate: 'rotate', pet: 'pet'
-};
-const UI_STATES = {
-  ready: 'ready', selected: 'selected', blocked: 'blocked'
-};
-const ANIMS = {
-  eat: 'eat'
-};
 const statsDecayKey = 'statsDecay';
 const globals = {};
 
-const gameScene = new Phaser.Scene('Game');
+window.gameScene = new Phaser.Scene('Game');
 let gameOverFunc;
 
 gameScene.init = function() {
@@ -30,20 +21,6 @@ gameScene.init = function() {
   globals.selcetedItem = null;
   globals.texts = {};
   gameOverFunc = () => gameOver(this);
-};
-
-gameScene.preload = function() {
-  this.load.image(ASSESTS.bg, 'img/background.jpg');
-  this.load.image(ASSESTS.toy, 'img/toy.png');
-  this.load.image(ASSESTS.apple, 'img/apple.png');
-  this.load.image(ASSESTS.candy, 'img/candy.png');
-  this.load.image(ASSESTS.rotate, 'img/rotate.png');
-
-  this.load.spritesheet(ASSESTS.pet, 'img/pet.png', {
-    frameWidth: 273,
-    frameHeight: 200,
-    spacing: 1
-  });
 };
 
 gameScene.create = function() {
@@ -67,16 +44,6 @@ gameScene.create = function() {
 gameScene.update = function() {
 
 };
-
-const game = new Phaser.Game({
-  type: Phaser.AUTO,
-  width: 360,
-  height: 640,
-  scene: gameScene,
-  title: 'Virtual Pet',
-  pixelArt: false,
-  backgroundColor: 'ffffff'
-});
 
 function addBackground() {
   let bg = this.add.image(0, 0, ASSESTS.bg)
@@ -238,7 +205,7 @@ function decreasePetStatsOverTime(scene) {
   globals.timedEventStats = scene.time.addEvent({
     delay: 1000,
     repeat: -1, // will reapet forever
-    callback: () => changePetStats(statsDecayKey);
+    callback: () => changePetStats(statsDecayKey)
   });
 }
 
@@ -250,7 +217,7 @@ function gameOver(scene) {
     delay: 2000,
     repeat: 0,
     callback: () => {
-      scene.scene.restart();
+      scene.scene.start('Home');
     }
   });
 }
