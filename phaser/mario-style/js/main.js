@@ -2,7 +2,7 @@ const ASSESTS = {
   ground: 'ground', platform: 'platform', block: 'block', gorilla: 'gorilla', barrel: 'barrel',
   player: 'player', fire: 'fire'
 };
-const globals = {};
+const gl = {}; // globals
 
 const gameScene = new Phaser.Scene('Game');
 
@@ -30,7 +30,14 @@ gameScene.preload = function() {
   });
 }
 
-gameScene.create = function() {}
+gameScene.create = function() {
+  // add sprite to physics system
+  /*gl.ground = this.add.sprite(180, 400, ASSESTS.ground);
+  this.physics.add.existing(gl.ground);*/
+
+  // create sprite and adding sprite to the physics
+  gl.ground = this.physics.add.sprite(180, 400, ASSESTS.ground);
+}
 
 gameScene.update = function() {}
 
@@ -40,5 +47,12 @@ const game = new Phaser.Game({
   height: 640,
   scene: gameScene,
   title: 'Mario Style Game',
-  pixelArt: false
+  pixelArt: false,
+  physics: { // turn on physics engine
+    default: 'arcade',
+    arcade: {
+      gravity: {y: 1000}, // diraction and strength of gravity
+      debug: true
+    }
+  }
 });
