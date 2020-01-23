@@ -31,12 +31,31 @@ gameScene.preload = function() {
 }
 
 gameScene.create = function() {
+  // creating statis groups
+  gl.staticGroup = this.add.group();
+
   // add sprite to physics system
-  /*gl.ground = this.add.sprite(180, 400, ASSESTS.ground);
-  this.physics.add.existing(gl.ground);*/
+  gl.ground = this.add.sprite(180, 604, ASSESTS.ground);
+  this.physics.add.existing(gl.ground, true);
 
   // create sprite and adding sprite to the physics
-  gl.ground = this.physics.add.sprite(180, 400, ASSESTS.ground);
+  /* -- second type to add sprite to physics
+  gl.ground = this.physics.add.sprite(180, 400, ASSESTS.ground, true);
+  gl.ground.body.allowGravity = false; // disable gravity for this sprite
+  gl.ground.body.immovable = false; // make it immovable
+  */
+
+  gl.platform = this.add.tileSprite(100, 500, 36 * 4, 30, ASSESTS.block); // sprite that consists of repeated image
+  this.physics.add.existing(gl.platform, true);
+
+  gl.staticGroup.add(gl.ground);
+  gl.staticGroup.add(gl.platform);
+
+  gl.player = this.add.sprite(100, 400, ASSESTS.player, 3);
+  this.physics.add.existing(gl.player);
+
+  // colision detection
+  this.physics.add.collider(gl.player, gl.staticGroup);
 }
 
 gameScene.update = function() {}
