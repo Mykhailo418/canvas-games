@@ -2,11 +2,16 @@ const ASSESTS = {
   ground: 'ground', platform: 'platform', block: 'block', gorilla: 'gorilla', barrel: 'barrel',
   player: 'player', fire: 'fire'
 };
+const ANIMS = {walking: 'walking'}
+let moveSpeed, jumpSpeed;
 const gl = {}; // globals
 
 const gameScene = new Phaser.Scene('Game');
 
-gameScene.init =  function() {}
+gameScene.init =  function() {
+  moveSpeed = 100;
+  jumpSpeed = -600;
+}
 
 gameScene.preload = function() {
   this.load.image(ASSESTS.ground, 'img/ground.png');
@@ -31,34 +36,28 @@ gameScene.preload = function() {
 }
 
 gameScene.create = function() {
-  // creating statis groups
-  gl.staticGroup = this.add.group();
+  createStaticSprites(this);
 
-  // add sprite to physics system
-  gl.ground = this.add.sprite(180, 604, ASSESTS.ground);
-  this.physics.add.existing(gl.ground, true);
+  // set worlds size
+  this.physics.world.bounds.width = 360;
+  this.physics.world.bounds.height = 700;
 
-  // create sprite and adding sprite to the physics
-  /* -- second type to add sprite to physics
-  gl.ground = this.physics.add.sprite(180, 400, ASSESTS.ground, true);
-  gl.ground.body.allowGravity = false; // disable gravity for this sprite
-  gl.ground.body.immovable = false; // make it immovable
-  */
-
-  gl.platform = this.add.tileSprite(100, 500, 36 * 4, 30, ASSESTS.block); // sprite that consists of repeated image
-  this.physics.add.existing(gl.platform, true);
-
-  gl.staticGroup.add(gl.ground);
-  gl.staticGroup.add(gl.platform);
-
+  // player
   gl.player = this.add.sprite(100, 400, ASSESTS.player, 3);
   this.physics.add.existing(gl.player);
+  gl.player.body.setCollideWorldBounds(true); // restrict to player go to the game bounds
 
   // colision detection
   this.physics.add.collider(gl.player, gl.staticGroup);
+
+  gl.cursorKeys = this.input.keyboard.createCursorKeys(); // enable cursor keys
+
+  createWalkingPlayerAnimation(this);
 }
 
-gameScene.update = function() {}
+gameScene.update = function() {
+  playerControl(this);
+}
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -75,3 +74,74 @@ const game = new Phaser.Game({
     }
   }
 });
+
+function createStaticSprites(scene) {
+  // creating statis groups
+  gl.staticGroup = scene.add.group();
+
+  // add sprite to physics system
+  const ground = scene.add.sprite(180, 604, ASSESTS.ground);
+  scene.physics.add.existing(ground, true);
+
+  // create sprite and adding sprite to the physics
+  /* -- second type to add sprite to physics
+  gl.ground = scene.physics.add.sprite(180, 400, ASSESTS.ground, true);
+  gl.ground.body.allowGravity = false; // disable gravity for this sprite
+  gl.ground.body.immovable = false; // make it immovable
+  */
+
+  const platform = scene.add.tileSprite(100, 500, 36 * 4, 30, ASSESTS.block); // sprite that consists of repeated image
+  scene.physics.add.existing(platform, true);
+
+  gl.staticGroup.add(ground);
+  gl.staticGroup.add(platform);
+}
+
+function playerControl(scene) {
+  const onGround = isPlayerOnGround();
+  // walking
+  if (gl.cursorKeys.left.isDown) {
+    gl.player.body.setVelocityX(moveSpeed*-1);
+    gl.player.flipX = false;
+    if (onGround && !gl.player.anims.isPlaying) {
+      gl.player.anims.play(ANIMS.walking);
+    }
+  } else if (gl.cursorKeys.right.isDown) {
+    gl.player.body.setVelocityX(moveSpeed);
+    gl.player.flipX = true;
+    if (onGround && !gl.player.anims.isPlaying) {
+      gl.player.anims.play(ANIMS.walking);
+    }
+  } else {
+    gl.player.body.setVelocityX(0);
+    if (gl.player.anims.isPlaying) {
+      gl.player.anims.stop(ANIMS.walking);
+    }
+    if (onGround) {
+      gl.player.setFrame(3);
+    }
+  }
+
+  // jumping
+  if (onGround && (gl.cursorKeys.space.isDown || gl.cursorKeys.up.isDown)) {
+    gl.player.body.setVelocityY(jumpSpeed);
+    gl.player.anims.stop(ANIMS.walking);
+    gl.player.setFrame(2);
+  }
+}
+
+function createWalkingPlayerAnimation(scene) {
+  scene.anims.create({
+    key: ANIMS.walking,
+    frames: scene.anims.generateFrameNames(ASSESTS.player, {
+      frames: [0, 1, 2],
+      frameRate: 12,
+      yoyo: true,
+      repeat: -1
+    })
+  });
+}
+
+function isPlayerOnGround() {
+  return gl.player.body.blocked.down || gl.player.body.touching.down;
+}
