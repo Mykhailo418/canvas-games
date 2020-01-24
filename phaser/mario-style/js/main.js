@@ -33,6 +33,8 @@ gameScene.preload = function() {
     margin: 1,
     spacing: 1
   });
+
+  this.load.json('levelData', 'json/levelData.json')
 }
 
 gameScene.create = function() {
@@ -89,12 +91,19 @@ function createStaticSprites(scene) {
   gl.ground.body.allowGravity = false; // disable gravity for this sprite
   gl.ground.body.immovable = false; // make it immovable
   */
-
-  const platform = scene.add.tileSprite(100, 500, 36 * 4, 30, ASSESTS.block); // sprite that consists of repeated image
-  scene.physics.add.existing(platform, true);
-
   gl.staticGroup.add(ground);
-  gl.staticGroup.add(platform);
+
+  // setup platforms
+  const platformsData = scene.cache.json.get('levelData').platforms;
+  const platformWidth = scene.textures.get(ASSESTS.block).get(0).width; // get(0) - is gerring a frame of 0 index
+  const platformHeight = scene.textures.get(ASSESTS.block).get(0).height;
+  platformsData.forEach(data => {
+     // sprite that consists of repeated image
+    const platform = scene.add.tileSprite(data.x, data.y, platformWidth * data.numTiles, platformHeight, ASSESTS.block);
+    platform.setOrigin(0);
+    scene.physics.add.existing(platform, true);
+    gl.staticGroup.add(platform);
+  });
 }
 
 function playerControl(scene) {
