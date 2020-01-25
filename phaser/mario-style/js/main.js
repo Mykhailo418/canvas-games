@@ -2,14 +2,14 @@ const ASSESTS = {
   ground: 'ground', platform: 'platform', block: 'block', gorilla: 'gorilla', barrel: 'barrel',
   player: 'player', fire: 'fire'
 };
-const ANIMS = {walking: 'walking'}
-let moveSpeed, jumpSpeed;
+const ANIMS = {walking: 'walking', burning: 'burning'};
+let moveSpeed, jumpSpeed, levelData;
 const gl = {}; // globals
 
 const gameScene = new Phaser.Scene('Game');
 
 gameScene.init =  function() {
-  moveSpeed = 100;
+  moveSpeed = 150;
   jumpSpeed = -600;
 }
 
@@ -38,23 +38,26 @@ gameScene.preload = function() {
 }
 
 gameScene.create = function() {
+  levelData = this.cache.json.get('levelData');
+
+  createFireAnumation(this);
+  createWalkingPlayerAnimation(this);
+
   createStaticSprites(this);
+  createDynamicSprites(this);
 
   // set worlds size
   this.physics.world.bounds.width = 360;
   this.physics.world.bounds.height = 700;
 
-  // player
-  gl.player = this.add.sprite(100, 400, ASSESTS.player, 3);
-  this.physics.add.existing(gl.player);
-  gl.player.body.setCollideWorldBounds(true); // restrict to player go to the game bounds
+  addPlayer(this);
+  addGorilla(this);
 
   // colision detection
   this.physics.add.collider(gl.player, gl.staticGroup);
+  this.physics.add.collider(gl.gorilla, gl.staticGroup);
 
   gl.cursorKeys = this.input.keyboard.createCursorKeys(); // enable cursor keys
-
-  createWalkingPlayerAnimation(this);
 }
 
 gameScene.update = function() {
@@ -94,7 +97,7 @@ function createStaticSprites(scene) {
   gl.staticGroup.add(ground);
 
   // setup platforms
-  const platformsData = scene.cache.json.get('levelData').platforms;
+  const platformsData = levelData.platforms;
   const platformWidth = scene.textures.get(ASSESTS.block).get(0).width; // get(0) - is gerring a frame of 0 index
   const platformHeight = scene.textures.get(ASSESTS.block).get(0).height;
   platformsData.forEach(data => {
@@ -103,6 +106,19 @@ function createStaticSprites(scene) {
     platform.setOrigin(0);
     scene.physics.add.existing(platform, true);
     gl.staticGroup.add(platform);
+  });
+}
+
+function createDynamicSprites(scene) {
+  gl.dynamicsGroup = scene.add.group();
+
+  levelData.fires.forEach(data => {
+    const fire = scene.add.sprite(data.x, data.y, ASSESTS.fire).setOrigin(0);
+    scene.physics.add.existing(fire);
+    fire.body.allowGravity = false;
+    fire.body.immovable = true;
+    fire.anims.play(ANIMS.burning);
+    gl.dynamicsGroup.add(fire);
   });
 }
 
@@ -143,14 +159,45 @@ function createWalkingPlayerAnimation(scene) {
   scene.anims.create({
     key: ANIMS.walking,
     frames: scene.anims.generateFrameNames(ASSESTS.player, {
-      frames: [0, 1, 2],
-      frameRate: 12,
-      yoyo: true,
-      repeat: -1
-    })
+      frames: [0, 1, 2]
+    }),
+    frameRate: 12,
+    yoyo: true,
+    repeat: -1
+  });
+}
+
+function createFireAnumation(scene) {
+  scene.anims.create({
+    key: ANIMS.burning,
+    frames: scene.anims.generateFrameNames(ASSESTS.fire, {
+      frames: [0, 1]
+    }),
+    frameRate: 4,
+    repeat: -1,
   });
 }
 
 function isPlayerOnGround() {
   return gl.player.body.blocked.down || gl.player.body.touching.down;
+}
+
+function addPlayer(scene) {
+  gl.player = scene.add.sprite(levelData.player.x, levelData.player.y, ASSESTS.player, 3);
+  scene.physics.add.existing(gl.player);
+  gl.player.body.setCollideWorldBounds(true); // restrict to player go to the game bounds
+
+  // FOR DEBUG:
+  gl.player.setInteractive();
+  scene.input.setDraggable(gl.player)
+  scene.input.on('drag', (pointer, gameObject, drawX, drawY) => {
+    //gameObject.x = drawX;
+    //gameObject.y = drawY;
+    console.log(drawX, drawY);
+  });
+}
+
+function addGorilla(scene) {
+  gl.gorilla = scene.add.sprite(levelData.gorilla.x, levelData.gorilla.y, ASSESTS.gorilla);
+  scene.physics.add.existing(gl.gorilla);
 }
