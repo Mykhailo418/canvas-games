@@ -47,21 +47,22 @@ gameScene.create = function() {
   createDynamicSprites(this);
 
   // set worlds size
-  this.physics.world.bounds.width = 360;
-  this.physics.world.bounds.height = 700;
+  this.physics.world.bounds.width = levelData.world.width;
+  this.physics.world.bounds.height = levelData.world.height;
 
   addPlayer(this);
   addGorilla(this);
+  addBarrelSpawner(this);
 
   // set camera set bounds
-  this.cameras.main.setBounds(0, 0, 360, 700);
+  this.cameras.main.setBounds(0, 0, levelData.world.width, levelData.world.height);
   this.cameras.main.startFollow(gl.player);
 
   // colision detection
-  this.physics.add.collider([gl.player, gl.gorilla], gl.staticGroup);
+  this.physics.add.collider([gl.player, gl.gorilla, gl.barrels], gl.staticGroup);
 
   // overlap checks
-  this.physics.add.overlap(gl.player, [gl.dynamicsGroup, gl.gorilla], restartGame, null, this);
+  this.physics.add.overlap(gl.player, [gl.dynamicsGroup, gl.gorilla, gl.barrels], restartGame, null, this);
 
   gl.cursorKeys = this.input.keyboard.createCursorKeys(); // enable cursor keys
 }
@@ -217,5 +218,44 @@ function restartGame(sourceSprite, targetSprite) {
   this.cameras.main.fade(500);
   this.cameras.main.once('camerafadeoutcomplete', () => {
     this.scene.restart();
+  });
+}
+
+function addBarrelSpawner(scene) {
+  gl.barrels = scene.physics.add.group({
+    bounceY: 0.1, // bouncing
+    bounceX: 1,
+    collideWorldBounds: true // reflect from the bounds
+  });
+
+  // spawn barrels
+  const spawningEvent = scene.time.addEvent({
+    delay: levelData.spawner.interval,
+    loop: true,
+    callback: () => {
+      // create sprite that will related to barrels group
+      let barrel = gl.barrels.get(gl.gorilla.x, gl.gorilla.y, ASSESTS.barrel);
+
+      // reactivate inorder to reuse
+      barrel.setActive(true);
+      barrel.setVisible(true);
+      barrel.body.enable = true;
+
+      barrel.setVelocityX(levelData.spawner.speed);
+
+      console.log(gl.barrels.getChildren().length);
+
+      // life of barrel
+      scene.time.addEvent({
+        delay: levelData.spawner.lifespan,
+        repeat: 0,
+        callback: () => {
+          // hiding barrel inorder to reuse it after ad a new barrel
+           gl.barrels.killAndHide(barrel);
+           barrel.body.enable = false;
+        }
+      });
+
+    }
   });
 }
