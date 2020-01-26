@@ -53,9 +53,15 @@ gameScene.create = function() {
   addPlayer(this);
   addGorilla(this);
 
+  // set camera set bounds
+  this.cameras.main.setBounds(0, 0, 360, 700);
+  this.cameras.main.startFollow(gl.player);
+
   // colision detection
-  this.physics.add.collider(gl.player, gl.staticGroup);
-  this.physics.add.collider(gl.gorilla, gl.staticGroup);
+  this.physics.add.collider([gl.player, gl.gorilla], gl.staticGroup);
+
+  // overlap checks
+  this.physics.add.overlap(gl.player, [gl.dynamicsGroup, gl.gorilla], restartGame, null, this);
 
   gl.cursorKeys = this.input.keyboard.createCursorKeys(); // enable cursor keys
 }
@@ -82,7 +88,7 @@ const game = new Phaser.Game({
 
 function createStaticSprites(scene) {
   // creating statis groups
-  gl.staticGroup = scene.add.group();
+  gl.staticGroup = scene.physics.add.staticGroup();
 
   // add sprite to physics system
   const ground = scene.add.sprite(180, 604, ASSESTS.ground);
@@ -110,13 +116,14 @@ function createStaticSprites(scene) {
 }
 
 function createDynamicSprites(scene) {
-  gl.dynamicsGroup = scene.add.group();
+  gl.dynamicsGroup = scene.physics.add.group({
+    allowGravity: false,
+    immovable: true
+  });
 
   levelData.fires.forEach(data => {
     const fire = scene.add.sprite(data.x, data.y, ASSESTS.fire).setOrigin(0);
     scene.physics.add.existing(fire);
-    fire.body.allowGravity = false;
-    fire.body.immovable = true;
     fire.anims.play(ANIMS.burning);
     gl.dynamicsGroup.add(fire);
   });
@@ -156,6 +163,8 @@ function playerControl(scene) {
 }
 
 function createWalkingPlayerAnimation(scene) {
+  if (scene.anims.get(ANIMS.walking)) return;
+
   scene.anims.create({
     key: ANIMS.walking,
     frames: scene.anims.generateFrameNames(ASSESTS.player, {
@@ -168,6 +177,8 @@ function createWalkingPlayerAnimation(scene) {
 }
 
 function createFireAnumation(scene) {
+  if (scene.anims.get(ANIMS.burning)) return;
+
   scene.anims.create({
     key: ANIMS.burning,
     frames: scene.anims.generateFrameNames(ASSESTS.fire, {
@@ -188,16 +199,23 @@ function addPlayer(scene) {
   gl.player.body.setCollideWorldBounds(true); // restrict to player go to the game bounds
 
   // FOR DEBUG:
-  gl.player.setInteractive();
+  /*gl.player.setInteractive();
   scene.input.setDraggable(gl.player)
   scene.input.on('drag', (pointer, gameObject, drawX, drawY) => {
-    //gameObject.x = drawX;
-    //gameObject.y = drawY;
+    gameObject.x = drawX;
+    gameObject.y = drawY;
     console.log(drawX, drawY);
-  });
+  });*/
 }
 
 function addGorilla(scene) {
   gl.gorilla = scene.add.sprite(levelData.gorilla.x, levelData.gorilla.y, ASSESTS.gorilla);
   scene.physics.add.existing(gl.gorilla);
+}
+
+function restartGame(sourceSprite, targetSprite) {
+  this.cameras.main.fade(500);
+  this.cameras.main.once('camerafadeoutcomplete', () => {
+    this.scene.restart();
+  });
 }
