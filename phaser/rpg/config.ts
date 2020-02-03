@@ -3,8 +3,8 @@ import { GameScene } from "./scenes/gameScene";
 import { BootScene } from "./scenes/bootScene";
 
 export const config: Phaser.Types.Core.GameConfig = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height:  window.innerHeight,
   type: Phaser.AUTO,
   parent: "game",
   scene: [BootScene, GameScene],
