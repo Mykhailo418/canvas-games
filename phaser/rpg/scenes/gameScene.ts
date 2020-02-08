@@ -3,6 +3,7 @@ import * as SCENES from '../constants/scenes.const';
 import * as OBJECTS from '../constants/objects.const';
 import { Player } from '../sprites/player';
 import { Portal } from '../sprites/portal';
+import { CoinsGroup } from '../groups/Coins';
 
 interface levelDataType {
   level: number;
@@ -21,6 +22,8 @@ export class GameScene extends Phaser.Scene {
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private levelData: levelDataType;
   private levelLoading: boolean;
+  private coins: Phaser.GameObjects.Sprite[];
+  private coinsGroup: CoinsGroup;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -39,6 +42,7 @@ export class GameScene extends Phaser.Scene {
     this.createMap();
     this.createPortal();
     this.createPlayer();
+    this.createCoins();
     this.addCollisions();
     this.cameras.main.startFollow(this.player);
   }
@@ -92,9 +96,17 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  createCoins(): void {
+    this.coins = this.map.createFromObjects('Coins', 'Coin', {
+      key: ASSETS.COIN
+    });
+    this.coinsGroup = new CoinsGroup(this.physics.world, this, [], this.coins);
+  }
+
   addCollisions(): void {
     this.physics.add.collider(this.player, this.blockedLayear);
     this.physics.add.overlap(this.player, this.portal, this.loadNextLevel.bind(this));
+    this.physics.add.overlap(this.coinsGroup, this.player, this.coinsGroup.collectCoin.bind(this.coinsGroup))
   }
 
   loadNextLevel(): void {
