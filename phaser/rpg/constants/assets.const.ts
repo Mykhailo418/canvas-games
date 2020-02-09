@@ -4,3 +4,4 @@ export const PACK_SHEET = 'RPGpack_sheet';
 export const CHATACTERS = 'roguelikeChar_transparent';
 export const PORTAL = 'portal';
 export const COIN = 'coin';
+export const BULLET = 'bullet';

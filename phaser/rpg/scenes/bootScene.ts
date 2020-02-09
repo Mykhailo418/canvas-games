@@ -18,8 +18,9 @@ export class BootScene extends Phaser.Scene {
       frameWidth: 17,
       frameHeight: 17
     });
-    this.load.image(ASSETS.PORTAL, 'assets/images/raft.png')
-    this.load.image(ASSETS.COIN, 'assets/images/coin_01.png')
+    this.load.image(ASSETS.PORTAL, 'assets/images/raft.png');
+    this.load.image(ASSETS.COIN, 'assets/images/coin_01.png');
+    this.load.image(ASSETS.BULLET, 'assets/images/ballBlack_04.png');
   }
 
   create(): void {

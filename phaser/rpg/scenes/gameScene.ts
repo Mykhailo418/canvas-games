@@ -5,6 +5,7 @@ import { Player } from '../sprites/player';
 import { Portal } from '../sprites/portal';
 import { CoinsGroup } from '../groups/Coins';
 import { EnemiesGroup } from '../groups/Enemies';
+import { BulletsGroup } from '../groups/Bullets';
 
 interface levelDataType {
   level: number;
@@ -27,6 +28,8 @@ export class GameScene extends Phaser.Scene {
   private coinsGroup: CoinsGroup;
   private enemies: Phaser.GameObjects.Sprite[];
   private enemiesGroup: EnemiesGroup;
+  private bulletsGroup: BulletsGroup;
+  private spaceKey: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -35,7 +38,7 @@ export class GameScene extends Phaser.Scene {
   init(data: levelDataType) {
     this.levelData = data;
     this.levelLoading = false;
-    
+
     // emit even that new game is started
     if (this.levelData.newGame) {
       this.events.emit('newGame');
@@ -52,12 +55,18 @@ export class GameScene extends Phaser.Scene {
     this.createPlayer();
     this.createCoins();
     this.createEnemies();
+    this.createBullets();
     this.addCollisions();
     this.cameras.main.startFollow(this.player);
+    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
   }
 
   update(): void {
     this.player.playerControl(this.cursors);
+
+    if (Phaser.Input.Keyboard.JustDown(this.spaceKey)) {
+      this.bulletsGroup.fireBullet(this.player.x, this.player.y, this.player.direction);
+    }
   }
 
   resizeCamera({width, height}:{width: number, height: number}) {
@@ -119,6 +128,10 @@ export class GameScene extends Phaser.Scene {
     this.enemiesGroup = new EnemiesGroup(this.physics.world, this, [], this.enemies);
   }
 
+  createBullets(): void {
+    this.bulletsGroup = new BulletsGroup(this.physics.world, this, []);
+  }
+
   addCollisions(): void {
     this.physics.add.collider(this.player, this.blockedLayear);
     this.physics.add.collider(this.enemiesGroup, this.blockedLayear);
@@ -126,6 +139,8 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.portal, this.loadNextLevel.bind(this));
     this.physics.add.overlap(this.coinsGroup, this.player, this.coinsGroup.collectCoin.bind(this.coinsGroup));
     this.physics.add.overlap(this.enemiesGroup, this.player, this.player.enemyCollision.bind(this.player));
+    console.log(this.bulletsGroup);
+    this.physics.add.overlap(this.enemiesGroup, this.bulletsGroup, this.bulletsGroup.enemyCollision.bind(this.bulletsGroup));
   }
 
   loadNextLevel(): void {

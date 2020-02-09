@@ -2,8 +2,10 @@ import { CHATACTERS } from '../constants/assets.const';
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
   private speed = 100;
+  private health = 3;
   scene: Phaser.Scene;
-  timeEvent: Phaser.Time. TimerEvent;
+  timeEvent: Phaser.Time.TimerEvent;
+  cancelMoveTimeEvent: Phaser.Time.TimerEvent;
 
   constructor(scene: Phaser.Scene, x: number, y: number, frame = 0) {
     super(scene, x, y, CHATACTERS, frame);
@@ -34,12 +36,29 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       default: this.setVelocityY(this.speed);
     }
 
-    this.scene.time.addEvent({
+    this.cancelMoveTimeEvent = this.scene.time.addEvent({
         delay: 500,
         callback: () => {
           this.setVelocity(0);
         }
     });
+  }
+
+  looseHealth(): void {
+    this.health --;
+    this.tint = 0xff0000;
+    if (!this.health) {
+      this.timeEvent.destroy(); // clear event of movement
+      this.cancelMoveTimeEvent.destroy();
+      this.destroy();
+    } else {
+      this.scene.time.addEvent({
+          delay: 500,
+          callback: () => {
+            this.tint = 0xffffff;
+          }
+      });
+    }
   }
 
 }

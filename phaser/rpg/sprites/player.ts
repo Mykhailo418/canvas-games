@@ -8,6 +8,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private speed = 150;
   private health = 3;
   private hitDelay = false;
+  direction = 'up';
   scene: GameScene;
 
   constructor(scene: GameScene, x: number, y: number) {
@@ -27,14 +28,18 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (cursors.up.isDown) {
       this.setVelocityY(-this.speed);
+      this.direction = 'up';
     } else if (cursors.down.isDown) {
       this.setVelocityY(this.speed);
+      this.direction = 'down';
     }
 
     if (cursors.left.isDown) {
       this.setVelocityX(-this.speed);
+      this.direction = 'left';
     } else if (cursors.right.isDown) {
       this.setVelocityX(this.speed);
+      this.direction = 'right';
     }
   }
 
@@ -47,7 +52,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.scene.time.addEvent({
           delay: 1200,
           callback: () => {
-            this.tint = 0xffffff; // set shade of sprtite to black(default)
+            this.tint = 0xffffff; // set shade of sprtite to white(default)
             this.hitDelay = false;
           }
       });
