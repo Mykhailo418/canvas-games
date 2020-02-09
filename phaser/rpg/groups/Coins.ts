@@ -18,7 +18,6 @@ export class CoinsGroup extends Phaser.Physics.Arcade.StaticGroup {
       coin.setScale(0.2);
       (<Phaser.Physics.Arcade.StaticBody>coin.body)
         .setSize(coin.displayWidth, coin.displayHeight);
-      console.log(coin);
       this.add(coin);
     });
     this.refresh(); // updates coins inorder to apply changes with setScale and setSize
@@ -27,5 +26,7 @@ export class CoinsGroup extends Phaser.Physics.Arcade.StaticGroup {
   collectCoin(player, coin): void {
     this.remove(coin);
     coin.destroy();
+    // dispatch an event
+    this.scene.events.emit('coinCollected');
   }
 }
