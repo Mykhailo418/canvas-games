@@ -4,6 +4,7 @@ import * as OBJECTS from '../constants/objects.const';
 import { Player } from '../sprites/player';
 import { Portal } from '../sprites/portal';
 import { CoinsGroup } from '../groups/Coins';
+import { EnemiesGroup } from '../groups/Enemies';
 
 interface levelDataType {
   level: number;
@@ -24,6 +25,8 @@ export class GameScene extends Phaser.Scene {
   private levelLoading: boolean;
   private coins: Phaser.GameObjects.Sprite[];
   private coinsGroup: CoinsGroup;
+  private enemies: Phaser.GameObjects.Sprite[];
+  private enemiesGroup: EnemiesGroup;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -32,17 +35,23 @@ export class GameScene extends Phaser.Scene {
   init(data: levelDataType) {
     this.levelData = data;
     this.levelLoading = false;
+    
+    // emit even that new game is started
+    if (this.levelData.newGame) {
+      this.events.emit('newGame');
+    }
   }
 
   preload(): void {}
 
   create(): void {
-    this.scale.on('resize', this.resizeCamera, this);
+      this.scale.on('resize', this.resizeCamera, this);
     this.cursors = this.input.keyboard.createCursorKeys(); // listen for player input
     this.createMap();
     this.createPortal();
     this.createPlayer();
     this.createCoins();
+    this.createEnemies();
     this.addCollisions();
     this.cameras.main.startFollow(this.player);
   }
@@ -97,34 +106,57 @@ export class GameScene extends Phaser.Scene {
   }
 
   createCoins(): void {
-    this.coins = this.map.createFromObjects('Coins', 'Coin', {
-      key: ASSETS.COIN
-    });
+    this.coins = this.map.createFromObjects(
+      'Coins', // name of layer in tilemap
+      'Coin', // name of object in layer in tilemap
+      {key: ASSETS.COIN}
+    );
     this.coinsGroup = new CoinsGroup(this.physics.world, this, [], this.coins);
+  }
+
+  createEnemies(): void {
+    this.enemies = this.map.createFromObjects('Enemies', 'Enemy', {});
+    this.enemiesGroup = new EnemiesGroup(this.physics.world, this, [], this.enemies);
   }
 
   addCollisions(): void {
     this.physics.add.collider(this.player, this.blockedLayear);
+    this.physics.add.collider(this.enemiesGroup, this.blockedLayear);
+
     this.physics.add.overlap(this.player, this.portal, this.loadNextLevel.bind(this));
-    this.physics.add.overlap(this.coinsGroup, this.player, this.coinsGroup.collectCoin.bind(this.coinsGroup))
+    this.physics.add.overlap(this.coinsGroup, this.player, this.coinsGroup.collectCoin.bind(this.coinsGroup));
+    this.physics.add.overlap(this.enemiesGroup, this.player, this.player.enemyCollision.bind(this.player));
   }
 
   loadNextLevel(): void {
+    let level;
+    switch(this.levelData.level) {
+      case 1: level = 2; break;
+      case 2: level = 1; break;
+    }
+    this.restartGame({
+      ...this.levelData,
+      level: level,
+      prevLevel: this.levelData.level,
+      newGame: false
+    });
+  }
+
+  restartToFirstLevel(): void {
+    this.restartGame({
+      ...this.levelData,
+      level: 1,
+      prevLevel: 0,
+      newGame: true,
+    });
+  }
+
+  private restartGame(levelData: levelDataType): void {
     if(this.levelLoading) return;
 
     this.cameras.main.fade(500, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      let level;
-      switch(this.levelData.level) {
-        case 1: level = 2; break;
-        case 2: level = 1; break;
-      }
-      this.scene.restart({
-        ...this.levelData,
-        level: level,
-        prevLevel: this.levelData.level,
-        newGame: false
-      });
+      this.scene.restart(levelData);
     });
     this.levelLoading = true;
   }

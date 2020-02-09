@@ -1,12 +1,16 @@
 import { CHATACTERS } from '../constants/assets.const';
+import { Enemy } from './enemy';
+import { GameScene } from '../scenes/gameScene';
 
 const frame = 324; // number of frame in CHATACTERS spritesheet
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
   private speed = 150;
-  scene: Phaser.Scene;
+  private health = 3;
+  private hitDelay = false;
+  scene: GameScene;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: GameScene, x: number, y: number) {
     super(scene, x, y, CHATACTERS, frame);
 
     this.scene = scene;
@@ -31,6 +35,30 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.setVelocityX(-this.speed);
     } else if (cursors.right.isDown) {
       this.setVelocityX(this.speed);
+    }
+  }
+
+  enemyCollision(player: Player, enemy: Enemy): void {
+    if (!this.hitDelay) {
+      this.loseHealth();
+      this.tint = 0xff0000; // set shade of sprtite to red
+      this.hitDelay = true;
+
+      this.scene.time.addEvent({
+          delay: 1200,
+          callback: () => {
+            this.tint = 0xffffff; // set shade of sprtite to black(default)
+            this.hitDelay = false;
+          }
+      });
+    }
+  }
+
+  private loseHealth(): void {
+    this.health --;
+    this.scene.events.emit('loseHealth', this.health);
+    if (!this.health) {
+      this.scene.restartToFirstLevel();
     }
   }
 }
