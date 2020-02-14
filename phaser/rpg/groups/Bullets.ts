@@ -31,7 +31,6 @@ export class BulletsGroup extends Phaser.Physics.Arcade.Group {
       bullet.setScale(0.1);
       bullet.setPosition(x, y);
       bullet.body.setVelocityX(300);
-      //console.log(bullet);
       switch (direction) {
         case 'down': bullet.body.setVelocity(0, this.speed); break;
         case 'left': bullet.body.setVelocity(-this.speed, 0); break;
