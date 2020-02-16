@@ -1,0 +1,10 @@
+export const BULLET = 'bullet';
+export const TOWER = 'tower';
+export const ENEMY = 'enemy';
+export const BASE = 'base';
+export const TITLE = 'title';
+export const CURSOR = 'cursor';
+export const BLUE_BTN_1 = 'blueButton1';
+export const BLUE_BTN_2 = 'blueButton2';
+export const TERRAIN = 'terrainTiles_default';
+export const LEVEL_1 = 'level1';
