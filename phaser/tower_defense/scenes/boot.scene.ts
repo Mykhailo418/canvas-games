@@ -1,7 +1,6 @@
 import * as SCENES from '../constants/scenes.const';
 
 export class BootScene extends Phaser.Scene {
-  private phaserSprite: Phaser.GameObjects.Sprite;
 
   constructor() {
     super({key: SCENES.BOOT});

@@ -2,8 +2,8 @@ import * as SCENES from '../constants/scenes.const';
 import * as ASSETS from '../constants/assets.const';
 
 export class PreloadScene extends Phaser.Scene {
-  private phaserSprite: Phaser.GameObjects.Sprite;
   private readyCount: number;
+  private timedEvent: Phaser.Time.TimerEvent;
 
   constructor() {
     super({key: SCENES.PRELOAD});
@@ -107,7 +107,7 @@ export class PreloadScene extends Phaser.Scene {
   ready(): void {
     this.readyCount++;
     if (this.readyCount === 2) {
-      this.scene.start(SCENES.GAME);
+      this.scene.start(SCENES.TITLE);
     }
   }
 }
