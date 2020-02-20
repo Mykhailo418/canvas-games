@@ -22,7 +22,7 @@ export class PreloadScene extends Phaser.Scene {
     this.loadAssets();
 
     // tile map in JSON format
-    this.load.tilemapTiledJSON(ASSETS.LEVEL_1, 'asssets/level/level1.json');
+    this.load.tilemapTiledJSON(ASSETS.LEVEL_1, 'assets/level/level1.json');
     this.load.spritesheet(ASSETS.TERRAIN, 'assets/level/terrainTiles_default.png', { frameWidth: 64, frameHeight: 64 });
   }
 
@@ -101,7 +101,7 @@ export class PreloadScene extends Phaser.Scene {
     });
 
     // time event for logo
-    this.timedEvent = this.time.delayedCall(3000, this.ready, [], this);
+    this.timedEvent = this.time.delayedCall(1000, this.ready, [], this);
   }
 
   ready(): void {
