@@ -3,6 +3,7 @@ import * as ASSETS from '../constants/assets.const';
 import * as OBJECTS from '../constants/objects.const';
 import gameMap from '../config/map';
 import { deepCopy } from '../utils';
+import { Enemy } from '../objects/Enemy';
 
 export class GameScene extends Phaser.Scene {
   private map: Phaser.Tilemaps.Tilemap;
@@ -13,6 +14,9 @@ export class GameScene extends Phaser.Scene {
   private cursor: Phaser.GameObjects.Image;
   private cursorSize: number
   private gameMap: number[][];
+  private nextEnemy: number;
+  private enemies: Phaser.GameObjects.Group;
+  private enemySpawnDelay: number;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -20,6 +24,8 @@ export class GameScene extends Phaser.Scene {
 
   init(): void {
     this.gameMap = deepCopy(gameMap);
+    this.nextEnemy = 0;
+    this.enemySpawnDelay = 2000;
   }
 
   preload(): void {
@@ -30,10 +36,11 @@ export class GameScene extends Phaser.Scene {
     this.createPath();
     this.createTower();
     this.createCursor();
+    this.createGroups();
   }
 
-  update(): void {
-
+  update(time: number, delta: number): void {
+    this.spawnEnemies(time, delta)
   }
 
   createTilemapObjects(): void {
@@ -78,5 +85,28 @@ export class GameScene extends Phaser.Scene {
 
   canPlaceTurret(i: number, j: number): boolean {
     return this.gameMap[j][i] === 0;
+  }
+
+  createGroups(): void {
+    this.enemies = this.physics.add.group({
+      classType: Enemy,
+      runChildUpdate: true // run update method of class 'Enemy'
+    });
+  }
+
+  spawnEnemies(time: number, delta: number): void {
+    let enemy: Enemy;
+    if (time > this.nextEnemy) {
+      enemy = this.enemies.getFirstDead(); // get first instance that is hidden(not active and not visible)
+      if (!enemy) {
+        enemy = new Enemy(this, 0, 0, this.path);
+        this.enemies.add(enemy);
+      }
+      if (enemy) {
+        enemy.showEnemy();
+        enemy.startOnPath();
+        this.nextEnemy = time + this.enemySpawnDelay;
+      }
+    }
   }
 }
