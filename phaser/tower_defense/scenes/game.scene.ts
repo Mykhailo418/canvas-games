@@ -4,6 +4,7 @@ import * as OBJECTS from '../constants/objects.const';
 import gameMap from '../config/map';
 import { deepCopy } from '../utils';
 import { Enemy } from '../objects/Enemy';
+import { Turret } from '../objects/Turret';
 
 export class GameScene extends Phaser.Scene {
   private map: Phaser.Tilemaps.Tilemap;
@@ -16,6 +17,7 @@ export class GameScene extends Phaser.Scene {
   private gameMap: number[][];
   private nextEnemy: number;
   private enemies: Phaser.GameObjects.Group;
+  private turrets: Phaser.GameObjects.Group;
   private enemySpawnDelay: number;
 
   constructor() {
@@ -37,10 +39,12 @@ export class GameScene extends Phaser.Scene {
     this.createTower();
     this.createCursor();
     this.createGroups();
+
+    this.input.on('pointerdown', this.placeTurret.bind(this));
   }
 
   update(time: number, delta: number): void {
-    this.spawnEnemies(time, delta)
+    this.spawnEnemies(time, delta);
   }
 
   createTilemapObjects(): void {
@@ -92,6 +96,10 @@ export class GameScene extends Phaser.Scene {
       classType: Enemy,
       runChildUpdate: true // run update method of class 'Enemy'
     });
+    this.turrets = this.physics.add.group({
+      classType: Turret,
+      runChildUpdate: true
+    });
   }
 
   spawnEnemies(time: number, delta: number): void {
@@ -107,6 +115,29 @@ export class GameScene extends Phaser.Scene {
         enemy.startOnPath();
         this.nextEnemy = time + this.enemySpawnDelay;
       }
+    }
+  }
+
+  getEnemy(x: number, y: number, range: number) {
+
+  }
+
+  addBullet(x: number, y: number, angle: number) {
+
+  }
+
+  placeTurret(pointer) {
+    const i = Math.floor(pointer.x / this.cursorSize);
+    const j = Math.floor(pointer.y / this.cursorSize);
+    if (this.canPlaceTurret(i, j)) {
+      let turret = this.turrets.getFirstDead();
+      if (!turret) {
+        turret = new Turret(this, 0, 0, this.gameMap);
+        this.turrets.add(turret);
+        turret.setBodyScaleToNormal();
+      }
+      turret.showTurret();
+      turret.place(i, j);
     }
   }
 }

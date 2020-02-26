@@ -4,7 +4,7 @@ export default {
     enemyHealth: 50
   },
   incremental: {
-    enemySpeed: 5,
+    enemySpeed: 5/100000,
     enemyHealth: 50
   }
 }

@@ -17,7 +17,6 @@ export class Enemy extends Phaser.GameObjects.Image {
   }
 
   update(time, delta) {
-    //console.log(time, delta, this.speed);
     this.follower.t += this.speed * delta;
 
     this.updateEnemyPosition();
@@ -29,7 +28,7 @@ export class Enemy extends Phaser.GameObjects.Image {
 
   startOnPath(level: number = 1): void {
     this.hp = levelConfig.initial.enemyHealth + level * levelConfig.incremental.enemyHealth; //reset health
-    this.speed = levelConfig.initial.enemyHealth + level * levelConfig.incremental.enemyHealth; //reset speed;
+    this.speed = levelConfig.initial.enemySpeed + level * levelConfig.incremental.enemySpeed; //reset speed;
     this.follower.t = 0; // set the 't' parameter of the start of the path
 
     this.updateEnemyPosition();
