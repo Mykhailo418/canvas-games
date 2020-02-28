@@ -5,7 +5,7 @@ import { Enemy } from './Enemy';
 export class Turret extends Phaser.GameObjects.Image {
   public scene: GameScene;
   private gameMap: number[][];
-  private nextShot: number;
+  private nextShot: number = 0;
   private fireDelay: number = 1000;
   private fireRange: number = 100;
 
@@ -20,10 +20,7 @@ export class Turret extends Phaser.GameObjects.Image {
   }
 
   update(time: number, delta: number) {
-    if (time > this.nextShot) {
-      this.fire();
-      this.nextShot = time + this.fireDelay;
-    }
+    this.searchingEnemy(time);
   }
 
   place(i: number, j: number) {
@@ -32,13 +29,20 @@ export class Turret extends Phaser.GameObjects.Image {
     this.gameMap[j][i] = 1;
   }
 
-  fire() {
-    /*const enemy = this.scene.getEnemy(this.x, this.y, this.fireRange);
+  searchingEnemy(time: number) {
+    const enemy: Enemy = this.scene.getEnemy(this.x, this.y, this.fireRange);
     if (enemy) {
       const angle = Phaser.Math.Angle.Between(this.x, this.y, enemy.x, enemy.y);
-      this.scene.addBullet(this.x, this.y, angle);
       this.angle = (angle + Math.PI/2) * Phaser.Math.RAD_TO_DEG;
-    }*/
+      if (time > this.nextShot) {
+        this.fire(angle);
+        this.nextShot = time + this.fireDelay;
+      }
+    }
+  }
+
+  fire(angle: number) {
+    this.scene.addBullet(this.x, this.y, angle);
   }
 
   private hideTurret() {

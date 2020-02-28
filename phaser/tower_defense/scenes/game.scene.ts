@@ -5,6 +5,7 @@ import gameMap from '../config/map';
 import { deepCopy } from '../utils';
 import { Enemy } from '../objects/Enemy';
 import { Turret } from '../objects/Turret';
+import { Bullet } from '../objects/Bullet';
 
 export class GameScene extends Phaser.Scene {
   private map: Phaser.Tilemaps.Tilemap;
@@ -18,6 +19,7 @@ export class GameScene extends Phaser.Scene {
   private nextEnemy: number;
   private enemies: Phaser.GameObjects.Group;
   private turrets: Phaser.GameObjects.Group;
+  private bullets: Phaser.GameObjects.Group;
   private enemySpawnDelay: number;
 
   constructor() {
@@ -100,6 +102,16 @@ export class GameScene extends Phaser.Scene {
       classType: Turret,
       runChildUpdate: true
     });
+    this.bullets = this.physics.add.group({
+      classType: Bullet,
+      runChildUpdate: true
+    });
+
+    this.setColissions();
+  }
+
+  setColissions() {
+    this.physics.add.overlap(this.enemies, this.bullets, this.damageEnemy.bind(this));
   }
 
   spawnEnemies(time: number, delta: number): void {
@@ -118,12 +130,24 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  getEnemy(x: number, y: number, range: number) {
-
+  getEnemy(x: number, y: number, distance: number): Enemy {
+    const enemiesArr = this.enemies.getChildren();
+    for (const enemy of enemiesArr) {
+      if (enemy.active &&
+        Phaser.Math.Distance.Between(x, y, (<Enemy>enemy).x, (<Enemy>enemy).y) <= distance
+      ) {
+        return <Enemy>enemy;
+      }
+    }
   }
 
   addBullet(x: number, y: number, angle: number) {
-
+    let bullet = this.bullets.getFirstDead();
+    if (!bullet) {
+      bullet = new Bullet(this, x, y);
+      this.bullets.add(bullet);
+    }
+    bullet.fire(x, y, angle);
   }
 
   placeTurret(pointer) {
@@ -138,6 +162,13 @@ export class GameScene extends Phaser.Scene {
       }
       turret.showTurret();
       turret.place(i, j);
+    }
+  }
+
+  damageEnemy(enemy: Enemy, bullet: Bullet) {
+    if (enemy.active && bullet.active) {
+      enemy.receiveDamage(bullet.damage);
+      bullet.hide();
     }
   }
 }
