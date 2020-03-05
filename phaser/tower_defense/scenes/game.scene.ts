@@ -21,6 +21,8 @@ export class GameScene extends Phaser.Scene {
   private turrets: Phaser.GameObjects.Group;
   private bullets: Phaser.GameObjects.Group;
   private enemySpawnDelay: number;
+  private score: number;
+  private health: number;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -30,6 +32,12 @@ export class GameScene extends Phaser.Scene {
     this.gameMap = deepCopy(gameMap);
     this.nextEnemy = 0;
     this.enemySpawnDelay = 2000;
+    this.health = 3;
+    this.score = 0;
+
+    this.events.emit('displayUI');
+    this.events.emit('updateScore', this.score);
+    this.events.emit('updateHealth', this.health);
   }
 
   preload(): void {
@@ -169,6 +177,21 @@ export class GameScene extends Phaser.Scene {
     if (enemy.active && bullet.active) {
       enemy.receiveDamage(bullet.damage);
       bullet.hide();
+    }
+  }
+
+  updateScore(point: number) {
+    this.score += point;
+    this.events.emit('updateScore', this.score);
+  }
+
+  updateHealth(loseHealth: number) {
+    this.health -= loseHealth;
+    this.events.emit('updateHealth', this.health);
+
+    if (this.health <= 0) {
+      this.events.emit('hideUI');
+      this.scene.start(SCENES.TITLE);
     }
   }
 }

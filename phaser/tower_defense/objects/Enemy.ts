@@ -8,6 +8,8 @@ export class Enemy extends Phaser.GameObjects.Image {
   private hp = 0;
   private speed = 0;
   private follower = {t: 0, vec: new Phaser.Math.Vector2()}
+  private pointOnDying = 10;
+  private looseHealthPoint = 1;
 
   constructor(scene, x, y, path) {
     super(scene, x, y, ASSETS.ENEMY);
@@ -23,6 +25,7 @@ export class Enemy extends Phaser.GameObjects.Image {
 
     if (this.follower.t >= 1) {
       this.hideEnemy();
+      this.scene.updateHealth(this.looseHealthPoint);
     }
   }
 
@@ -38,6 +41,7 @@ export class Enemy extends Phaser.GameObjects.Image {
     this.hp -= damage;
     if (this.hp <= 0) {
       this.hideEnemy();
+      this.scene.updateScore(this.pointOnDying);
     }
   }
 
