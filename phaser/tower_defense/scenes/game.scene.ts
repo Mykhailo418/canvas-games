@@ -2,10 +2,12 @@ import * as SCENES from '../constants/scenes.const';
 import * as ASSETS from '../constants/assets.const';
 import * as OBJECTS from '../constants/objects.const';
 import gameMap from '../config/map';
+import levelConfig from '../config/levelConfig';
 import { deepCopy } from '../utils';
 import { Enemy } from '../objects/Enemy';
 import { Turret } from '../objects/Turret';
 import { Bullet } from '../objects/Bullet';
+import { UiScene } from './ui.scene';
 
 export class GameScene extends Phaser.Scene {
   private map: Phaser.Tilemaps.Tilemap;
@@ -23,6 +25,11 @@ export class GameScene extends Phaser.Scene {
   private enemySpawnDelay: number;
   private score: number;
   private health: number;
+  private availableTurrets: number;
+  private remainingEnemies: number;
+  private level: number;
+  private roundStarted: boolean;
+  private uiScene: UiScene;
 
   constructor() {
     super({key: SCENES.GAME});
@@ -32,18 +39,32 @@ export class GameScene extends Phaser.Scene {
     this.gameMap = deepCopy(gameMap);
     this.nextEnemy = 0;
     this.enemySpawnDelay = 2000;
-    this.health = 3;
+    this.health = levelConfig.initial.baseHealth;
     this.score = 0;
+    this.level = 1;
+    this.availableTurrets = levelConfig.initial.numOfTurrets;
+    this.roundStarted = false;
+    this.remainingEnemies = levelConfig.initial.numOfEnemies + this.level * levelConfig.incremental.numOfEnemies;
 
     this.events.emit('displayUI');
     this.events.emit('updateScore', this.score);
     this.events.emit('updateHealth', this.health);
+    this.events.emit('updateTurretsCount', this.availableTurrets);
+    this.events.emit('updateEnemies', this.remainingEnemies);
+
+    this.uiScene = <UiScene>this.scene.get(SCENES.UI);
   }
 
   preload(): void {
   }
 
   create(): void {
+    this.events.emit('startRound', this.level);
+
+    this.uiScene.events.on('roundReady', () =>{
+      this.roundStarted = true;
+    });
+
     this.createTilemapObjects();
     this.createPath();
     this.createTower();
@@ -98,7 +119,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   canPlaceTurret(i: number, j: number): boolean {
-    return this.gameMap[j][i] === 0;
+    return this.gameMap[j][i] === 0 && this.availableTurrets > 0;
   }
 
   createGroups(): void {
@@ -124,7 +145,7 @@ export class GameScene extends Phaser.Scene {
 
   spawnEnemies(time: number, delta: number): void {
     let enemy: Enemy;
-    if (time > this.nextEnemy) {
+    if (time > this.nextEnemy && this.roundStarted && this.enemies.countActive(true) < this.remainingEnemies) {
       enemy = this.enemies.getFirstDead(); // get first instance that is hidden(not active and not visible)
       if (!enemy) {
         enemy = new Enemy(this, 0, 0, this.path);
@@ -132,7 +153,7 @@ export class GameScene extends Phaser.Scene {
       }
       if (enemy) {
         enemy.showEnemy();
-        enemy.startOnPath();
+        enemy.startOnPath(this.level);
         this.nextEnemy = time + this.enemySpawnDelay;
       }
     }
@@ -170,6 +191,7 @@ export class GameScene extends Phaser.Scene {
       }
       turret.showTurret();
       turret.place(i, j);
+      this.updateTurretsCount(-1);
     }
   }
 
@@ -193,5 +215,30 @@ export class GameScene extends Phaser.Scene {
       this.events.emit('hideUI');
       this.scene.start(SCENES.TITLE);
     }
+  }
+
+  updateTurretsCount(numberOfTurrets) {
+    this.availableTurrets += numberOfTurrets;
+    this.events.emit('updateTurretsCount', this.availableTurrets);
+  }
+
+  updateEnemies(numberOfEnemies: number) {
+    this.remainingEnemies += numberOfEnemies;
+    this.events.emit('updateEnemies', this.remainingEnemies);
+    if (this.remainingEnemies <= 0) {
+      this.increaseLevel();
+    }
+  }
+
+  increaseLevel() {
+    // stop round
+    this.roundStarted = false;
+    // increment level
+    this.level++;
+    // increment number of turrets
+    this.updateTurretsCount(levelConfig.incremental.numOfTurrets);
+    // increment number of enemies
+    this.updateEnemies(levelConfig.initial.numOfEnemies + this.level * levelConfig.incremental.numOfEnemies);
+    this.events.emit('startRound', this.level);
   }
 }

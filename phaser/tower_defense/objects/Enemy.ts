@@ -42,6 +42,7 @@ export class Enemy extends Phaser.GameObjects.Image {
     if (this.hp <= 0) {
       this.hideEnemy();
       this.scene.updateScore(this.pointOnDying);
+      this.scene.updateEnemies(-1);
     }
   }
 
