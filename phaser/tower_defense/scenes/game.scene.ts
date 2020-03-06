@@ -92,8 +92,8 @@ export class GameScene extends Phaser.Scene {
     this.path.lineTo(480, 544);
 
     // only for debugging
-    this.graphics.lineStyle(3, 0xffffff, 1);
-    this.path.draw(this.graphics);
+    //this.graphics.lineStyle(3, 0xffffff, 1);
+    //this.path.draw(this.graphics);
   }
 
   createTower(): void {
