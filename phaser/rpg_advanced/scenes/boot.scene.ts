@@ -17,7 +17,7 @@ export class BootScene extends Phaser.Scene {
     super({key: SCENES.BOOT});
 
     this.levels = {
-      title: {
+      [SCENES.TITLE]: {
         key: SCENES.TITLE,
         path: 'assets/levels/title_screen.json'
       }
@@ -31,8 +31,10 @@ export class BootScene extends Phaser.Scene {
     });
   }
 
-  create(): void {
-    console.log(this.cache.json.get('title'));
+  // params come from "this.scene.start(SCENES.BOOT, {sceneName: SCENES.TITLE})"
+  create(params: {sceneName: string}): void {
+    const levelData = this.cache.json.get(params.sceneName);
+    this.scene.start(SCENES.LOADING, {levelData});
   }
 
   update(): void {
