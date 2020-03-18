@@ -40,7 +40,7 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   create(params: {sceneName: string}) {
-
+      this.scene.start(SCENES.TITLE, {levelData: this.levelData})
   }
 
   update(): void {
