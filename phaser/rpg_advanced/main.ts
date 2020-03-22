@@ -5,6 +5,7 @@ import { GameScene } from "./scenes/game.scene";
 import { TitleScene } from "./scenes/title.scene";
 import { BootScene } from "./scenes/boot.scene";
 import { LoadingScene } from "./scenes/loading.scene";
+import { WorldScene } from "./scenes/world.scene";
 
 class Game extends Phaser.Game {
   constructor() {
@@ -13,7 +14,10 @@ class Game extends Phaser.Game {
     this.scene.add(SCENES.LOADING, LoadingScene);
     this.scene.add(SCENES.TITLE, TitleScene);
     this.scene.add(SCENES.GAME, GameScene);
-    this.scene.start(SCENES.BOOT, {sceneName: SCENES.TITLE});
+    this.scene.add(SCENES.WORLD, WorldScene);
+    this.scene.start(SCENES.BOOT, {
+      sceneName: SCENES.TITLE
+    });
   }
 }
 

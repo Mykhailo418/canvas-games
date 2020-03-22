@@ -39,8 +39,8 @@ export class LoadingScene extends Phaser.Scene {
     });
   }
 
-  create(params: {sceneName: string}) {
-      this.scene.start(SCENES.TITLE, {levelData: this.levelData})
+  create(params: {levelData: any, scene: string}) {
+      this.scene.start(params.scene, {levelData: this.levelData})
   }
 
   update(): void {

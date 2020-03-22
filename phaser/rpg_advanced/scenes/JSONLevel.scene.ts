@@ -4,9 +4,9 @@ import { TextPrefab } from '../prefabs/textPrefab';
 
 export class JSONLevelScene extends Phaser.Scene {
   private phaserSprite: Phaser.GameObjects.Sprite;
-  private levelData: any;
-  private sprites: any;
-  private groups: any;
+  protected levelData: any;
+  public sprites: any;
+  public groups: any;
 
   constructor(key) {
     super({key});
@@ -30,11 +30,13 @@ export class JSONLevelScene extends Phaser.Scene {
 
   protected addSprites() {
     this.sprites = {};
-    Object.keys(this.levelData.sprites).forEach(spriteName => {
-      const {type, position, properties} = this.levelData.sprites[spriteName];
-      const PrefabClass: any = this.getPrefabClass(type);
-      let sprite =  new PrefabClass(this, spriteName, position, properties);
-    });
+    if (this.levelData.sprites) {
+      Object.keys(this.levelData.sprites).forEach(spriteName => {
+        const {type, position, properties} = this.levelData.sprites[spriteName];
+        const PrefabClass: any = this.getPrefabClass(type);
+        let sprite = new PrefabClass(this, spriteName, position, properties);
+      });
+    }
   }
 
   protected getPrefabClass(type: string, ...props): any {
