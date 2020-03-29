@@ -21,10 +21,17 @@ export class JSONLevelScene extends Phaser.Scene {
     this.addSprites();
   }
 
+  update(): void {
+    Object.keys(this.sprites).forEach(key => {
+      const sprite = this.sprites[key];
+      sprite.update && sprite.update();
+    });
+  }
+
   protected addGroupsOfSprites() {
     this.groups = {};
     this.levelData.groups.forEach(groupName => {
-      this.groups[groupName] = this.add.group();
+      this.groups[groupName] = this.physics.add.group();
     });
   }
 

@@ -24,11 +24,7 @@ export class WorldScene extends JSONLevelScene {
 
     this.createObjects();
   }
-
-  update() {
-
-  }
-
+  
   private createTilesets() {
     this.tilesets = this.map.tilesets.reduce((acc: any, tileset: any, index: number) => {
       const tilesetLevelData = this.levelData.map.tilesets[index];
