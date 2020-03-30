@@ -13,18 +13,18 @@ export class TitleScene extends JSONLevelScene {
     super.create();
   }
 
-  update() {
+  /*update() {
     if (this.input.activePointer.isDown) {
       this.startGame();
     }
-  }
+  }*/
 
   private addBackground() {
     const bg = this.add.sprite(0, 0, this.bg_asset);
     bg.setOrigin(0, 0);
   }
 
-  private startGame() {
+  login() {
     this.scene.start(SCENES.BOOT, {
       sceneName: SCENES.WORLD
     });

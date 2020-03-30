@@ -17,7 +17,7 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   preload() {
-    const {assets} = this.levelData;
+    const {assets, user_input} = this.levelData;
     Object.keys(assets).forEach(assetKey => {
       const asset = assets[assetKey];
       switch (asset.type) {
@@ -36,6 +36,10 @@ export class LoadingScene extends Phaser.Scene {
               this.load.tilemapTiledJSON(assetKey, asset.source);
               break;
       }
+    });
+    console.log(user_input);
+    Object.keys(user_input).forEach(key => {
+        this.load.json(key, user_input[key]);
     });
   }
 

@@ -1,12 +1,15 @@
 import * as SCENES from '../constants/scenes.const';
 import { Prefab } from '../prefabs/prefab';
 import { TextPrefab } from '../prefabs/textPrefab';
+import { UserInput } from '../plugins/UserInput';
 
 export class JSONLevelScene extends Phaser.Scene {
   private phaserSprite: Phaser.GameObjects.Sprite;
   protected levelData: any;
   public sprites: any;
   public groups: any;
+  userInputs: UserInput[];
+  userInputData: any[];
 
   constructor(key) {
     super({key});
@@ -14,11 +17,16 @@ export class JSONLevelScene extends Phaser.Scene {
 
   init(data: any) {
     this.levelData = data.levelData;
+    this.userInputs = [];
+    this.userInputData = [];
+    this.input.keyboard.removeAllListeners('keydown');
+    this.input.keyboard.removeAllListeners('keyup');
   }
 
   create(): void {
     this.addGroupsOfSprites();
     this.addSprites();
+    this.setupUserInput();
   }
 
   update(): void {
@@ -52,5 +60,14 @@ export class JSONLevelScene extends Phaser.Scene {
       case 'sprite': return Prefab;
       case 'text': return TextPrefab;
     }
+  }
+
+  protected setupUserInput() {
+    //this.userInput = new UserInput(this);
+    Object.keys(this.levelData.user_input).forEach((key, index) => {
+      this.userInputs.push(new UserInput(this));
+      this.userInputData.push(this.cache.json.get(key));
+      this.userInputs[index].set_input(this.userInputData[index]);
+    });
   }
 }

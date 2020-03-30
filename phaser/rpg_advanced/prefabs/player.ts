@@ -15,6 +15,8 @@ export class Player extends Prefab {
 
   private stopped_frames = [0, 1, 0, 2, 3];
 
+  moving: any;
+
   constructor(scene: any, name: string, position: any, properties: PlayerProperties) {
     super(scene, name, position, properties);
 
@@ -28,21 +30,24 @@ export class Player extends Prefab {
     this.scene.physics.add.collider(this, this.scene.layers.buildings);
 
     //body.velocity.x = -this.walkingSpeed;
-    this.left = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
+
+    /*this.left = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
     this.right = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
     this.up = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-    this.down = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+    this.down = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);*/
+
+    this.moving = {left: false, right: false, up: false, down: false};
 
     this.createAnimations();
   }
 
   update() {
-    if (this.left.isDown && this.bodyPlayer.velocity.x <= 0) {
+    if (this.moving.left && this.bodyPlayer.velocity.x <= 0) {
       this.bodyPlayer.velocity.x = -this.walkingSpeed;
       if (this.bodyPlayer.velocity.y === 0) {
         this.anims.play(WALKIN_LEFT, true);
       }
-    } else if(this.right.isDown && this.bodyPlayer.velocity.x >= 0) {
+    } else if(this.moving.right && this.bodyPlayer.velocity.x >= 0) {
       this.bodyPlayer.velocity.x = this.walkingSpeed;
       if (this.bodyPlayer.velocity.y === 0) {
         this.anims.play(WALKIN_RIGHT, true);
@@ -51,12 +56,12 @@ export class Player extends Prefab {
       this.bodyPlayer.velocity.x = 0;
     }
 
-    if (this.up.isDown && this.bodyPlayer.velocity.y <= 0) {
+    if (this.moving.up && this.bodyPlayer.velocity.y <= 0) {
       this.bodyPlayer.velocity.y = -this.walkingSpeed;
       if (this.bodyPlayer.velocity.x === 0) {
         this.anims.play(WALKIN_UP, true);
       }
-    } else if (this.down.isDown && this.bodyPlayer.velocity.y >= 0) {
+    } else if (this.moving.down && this.bodyPlayer.velocity.y >= 0) {
       this.bodyPlayer.velocity.y = this.walkingSpeed;
       if (this.bodyPlayer.velocity.x === 0) {
         this.anims.play(WALKIN_DOWN, true);
@@ -71,6 +76,10 @@ export class Player extends Prefab {
       // -- is number and have 1 of 4 values Phaser.LEFT, Phaser.RIGHT, Phaser.UP,  Phaser.DOWN;
       this.setFrame(this.stopped_frames[this.bodyPlayer.facing - 10]);
     }
+  }
+
+  change_movement(direction, value) {
+    this.moving[direction] = value;
   }
 
   private createAnimations() {
