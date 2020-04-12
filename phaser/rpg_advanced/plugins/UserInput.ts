@@ -32,6 +32,7 @@ export class UserInput {
                 } else {
                     context = this.scene.sprites[callback_data[0]];
                 }
+
                 let method = context[callback_data[1]];
                 method.apply(context, user_input.args);
             }

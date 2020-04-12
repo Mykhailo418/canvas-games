@@ -24,6 +24,10 @@ export class BootScene extends Phaser.Scene {
       [SCENES.WORLD]: {
         key: SCENES.WORLD,
         path: 'assets/levels/town.json'
+      },
+      [SCENES.CAVE]: {
+        key: SCENES.WORLD,
+        path: 'assets/levels/cave.json'
       }
     }
   }
@@ -40,7 +44,7 @@ export class BootScene extends Phaser.Scene {
     const levelData = this.cache.json.get(params.sceneName);
     this.scene.start(SCENES.LOADING, {
       levelData,
-      scene: params.sceneName
+      scene: this.levels[params.sceneName].key
     });
   }
 

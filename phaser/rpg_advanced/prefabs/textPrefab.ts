@@ -1,9 +1,8 @@
-export interface TextPrefabProperties {
+import { PrefabProperties } from "./prefab";
+
+export interface TextPrefabProperties extends PrefabProperties {
   text: string;
-  style:  any;
-  group: string;
-  scale: {x: number, y: number};
-  anchor: {x: number, y: number};
+  style: any;
 }
 
 export class TextPrefab extends Phaser.GameObjects.Text {

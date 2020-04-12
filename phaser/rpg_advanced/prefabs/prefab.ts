@@ -1,9 +1,9 @@
 export interface PrefabProperties {
-  texture:  any;
-  frame: number;
+  texture?: any;
+  frame?: number;
   group: string;
-  scale: {x: number, y: number};
-  anchor: {x: number, y: number};
+  scale?: {x: number, y: number};
+  anchor?: {x: number, y: number};
 }
 
 export class Prefab extends Phaser.GameObjects.Sprite {

@@ -8,8 +8,9 @@ export class JSONLevelScene extends Phaser.Scene {
   protected levelData: any;
   public sprites: any;
   public groups: any;
-  userInputs: UserInput[];
-  userInputData: any[];
+  userInput: any;
+  userInputData: any;
+  userInputs: any = {};
 
   constructor(key) {
     super({key});
@@ -65,9 +66,15 @@ export class JSONLevelScene extends Phaser.Scene {
   protected setupUserInput() {
     //this.userInput = new UserInput(this);
     Object.keys(this.levelData.user_input).forEach((key, index) => {
-      this.userInputs.push(new UserInput(this));
+      /*this.userInputs.push(new UserInput(this));
       this.userInputData.push(this.cache.json.get(key));
-      this.userInputs[index].set_input(this.userInputData[index]);
+      this.userInputs[index].set_input(this.userInputData[index]);*/
+
+      this.userInputs[key] = this.cache.json.get(key);
     });
+
+    this.userInput = new UserInput(this);
+    this.userInputData = this.cache.json.get(this.levelData.initial_user_input);
+    this.userInput.set_input(this.userInputData);
   }
 }

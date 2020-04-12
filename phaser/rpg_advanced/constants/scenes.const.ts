@@ -1,5 +1,6 @@
-export const GAME = 'GameScene';
-export const TITLE = 'TitleScene';
-export const BOOT = 'BootScene';
-export const LOADING = 'LoadingScene';
-export const WORLD = 'WorldScene';
+export const GAME = 'game';
+export const TITLE = 'title';
+export const BOOT = 'boot';
+export const LOADING = 'loading';
+export const WORLD = 'world';
+export const CAVE = 'cave';

@@ -37,7 +37,6 @@ export class LoadingScene extends Phaser.Scene {
               break;
       }
     });
-    console.log(user_input);
     Object.keys(user_input).forEach(key => {
         this.load.json(key, user_input[key]);
     });

@@ -1,17 +1,33 @@
 import * as SCENES from '../constants/scenes.const';
 import { JSONLevelScene } from './JSONLevel.scene';
 import { Player } from '../prefabs/player';
+import { Door } from '../prefabs/door';
+import { NPC } from '../prefabs/npc';
+import { MsgBox } from '../prefabs/msgBox';
 
 export class WorldScene extends JSONLevelScene {
   private map: Phaser.Tilemaps.Tilemap;
   private tilesets: any;
   private layers: any;
   private prefabClasses = {
-    player: Player.prototype.constructor
+    player: Player.prototype.constructor,
+    door: Door.prototype.constructor,
+    npc: NPC.prototype.constructor
   };
+  public TEXT_STYLE = {
+    font: '14px Kells',
+    fill: '#ffffff'
+  };
+  current_message_box: MsgBox;
 
   constructor() {
     super(SCENES.WORLD);
+  }
+
+  preload() {
+    for (let npc_msg_name in this.levelData.npc_messages) {
+      this.load.text(npc_msg_name, this.levelData.npc_messages[npc_msg_name]);
+    }
   }
 
   create() {
@@ -24,7 +40,7 @@ export class WorldScene extends JSONLevelScene {
 
     this.createObjects();
   }
-  
+
   private createTilesets() {
     this.tilesets = this.map.tilesets.reduce((acc: any, tileset: any, index: number) => {
       const tilesetLevelData = this.levelData.map.tilesets[index];
@@ -58,4 +74,8 @@ export class WorldScene extends JSONLevelScene {
     });
   }
 
+  end_talk() {
+    this.current_message_box.destroy();
+    this.userInput.set_input(this.userInputs.town_user_input);
+  }
 }

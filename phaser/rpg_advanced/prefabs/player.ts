@@ -42,13 +42,27 @@ export class Player extends Prefab {
   }
 
   update() {
+    if(this.body) {
+      this.movement();
+    }
+  }
+
+  change_movement(direction, value) {
+    this.moving[direction] = value;
+  }
+
+  stop() {
+      this.moving = {left: false, right: false, up: false, down: false};
+  }
+
+  private movement() {
     if (this.moving.left && this.bodyPlayer.velocity.x <= 0) {
       this.bodyPlayer.velocity.x = -this.walkingSpeed;
       if (this.bodyPlayer.velocity.y === 0) {
         this.anims.play(WALKIN_LEFT, true);
       }
     } else if(this.moving.right && this.bodyPlayer.velocity.x >= 0) {
-      this.bodyPlayer.velocity.x = this.walkingSpeed;
+      this.bodyPlayer.velocity.x = +this.walkingSpeed;
       if (this.bodyPlayer.velocity.y === 0) {
         this.anims.play(WALKIN_RIGHT, true);
       }
@@ -62,7 +76,7 @@ export class Player extends Prefab {
         this.anims.play(WALKIN_UP, true);
       }
     } else if (this.moving.down && this.bodyPlayer.velocity.y >= 0) {
-      this.bodyPlayer.velocity.y = this.walkingSpeed;
+      this.bodyPlayer.velocity.y = +this.walkingSpeed;
       if (this.bodyPlayer.velocity.x === 0) {
         this.anims.play(WALKIN_DOWN, true);
       }
@@ -76,10 +90,6 @@ export class Player extends Prefab {
       // -- is number and have 1 of 4 values Phaser.LEFT, Phaser.RIGHT, Phaser.UP,  Phaser.DOWN;
       this.setFrame(this.stopped_frames[this.bodyPlayer.facing - 10]);
     }
-  }
-
-  change_movement(direction, value) {
-    this.moving[direction] = value;
   }
 
   private createAnimations() {
