@@ -9,7 +9,7 @@ export class TitleScene extends JSONLevelScene {
   }
 
   create() {
-    this.addBackground();
+    //this.addBackground();
     super.create();
   }
 
@@ -19,10 +19,10 @@ export class TitleScene extends JSONLevelScene {
     }
   }*/
 
-  private addBackground() {
-    const bg = this.add.sprite(0, 0, this.bg_asset);
-    bg.setOrigin(0, 0);
-  }
+  // private addBackground() {
+  //   const bg = this.add.sprite(0, 0, this.bg_asset);
+  //   bg.setOrigin(0, 0);
+  // }
 
   login() {
     this.scene.start(SCENES.BOOT, {

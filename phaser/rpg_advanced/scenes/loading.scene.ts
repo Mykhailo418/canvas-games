@@ -9,6 +9,7 @@ export class LoadingScene extends Phaser.Scene {
   }
 
   init(data: any) {
+    console.log('loading', data);
     this.levelData = data.levelData;
     const loadingMsg = this.add.text(320, 240, "Loading", {
       font: "48px Kells",
@@ -37,9 +38,11 @@ export class LoadingScene extends Phaser.Scene {
               break;
       }
     });
-    Object.keys(user_input).forEach(key => {
-        this.load.json(key, user_input[key]);
-    });
+    if (user_input) {
+      Object.keys(user_input).forEach(key => {
+          this.load.json(key, user_input[key]);
+      });
+    }
   }
 
   create(params: {levelData: any, scene: string}) {

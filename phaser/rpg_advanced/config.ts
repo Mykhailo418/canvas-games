@@ -1,5 +1,5 @@
 export const config: Phaser.Types.Core.GameConfig = {
-  width: 640,
+  width: 840,
   height: 560,
   type: Phaser.AUTO,
   parent: "game",

@@ -8,9 +8,10 @@ export class JSONLevelScene extends Phaser.Scene {
   protected levelData: any;
   public sprites: any;
   public groups: any;
+  public prefabClasses: any = {};
   userInput: any;
   userInputData: any;
-  userInputs: any = {};
+  userInputs: any;
 
   constructor(key) {
     super({key});
@@ -38,6 +39,7 @@ export class JSONLevelScene extends Phaser.Scene {
   }
 
   protected addGroupsOfSprites() {
+    console.log( this.scene.key, this.levelData);
     this.groups = {};
     this.levelData.groups.forEach(groupName => {
       this.groups[groupName] = this.physics.add.group();
@@ -49,22 +51,34 @@ export class JSONLevelScene extends Phaser.Scene {
     if (this.levelData.sprites) {
       Object.keys(this.levelData.sprites).forEach(spriteName => {
         const {type, position, properties} = this.levelData.sprites[spriteName];
-        const PrefabClass: any = this.getPrefabClass(type);
-        let sprite = new PrefabClass(this, spriteName, position, properties);
+        if (type === 'background') {
+          this.addBackground(properties.texture);
+        } else {
+          const PrefabClass: any = this.getPrefabClass(type);
+          if (PrefabClass) {
+            let sprite = new PrefabClass(this, spriteName, position, properties);
+            console.log('this.levelData.sprites: ', sprite);
+          }
+        }
       });
     }
   }
 
-  protected getPrefabClass(type: string, ...props): any {
+  protected getPrefabClass(type: string, ): any {
+    if (this.prefabClasses[type]) {
+      return this.prefabClasses[type];
+    }
     switch (type) {
       case 'background':
-      case 'sprite': return Prefab;
-      case 'text': return TextPrefab;
+      case 'sprite': return Prefab.prototype.constructor;
+      case 'text': return TextPrefab.prototype.constructor;
     }
   }
 
   protected setupUserInput() {
+    if (!this.levelData.user_input) return;
     //this.userInput = new UserInput(this);
+    this.userInputs = {};
     Object.keys(this.levelData.user_input).forEach((key, index) => {
       /*this.userInputs.push(new UserInput(this));
       this.userInputData.push(this.cache.json.get(key));
@@ -76,5 +90,10 @@ export class JSONLevelScene extends Phaser.Scene {
     this.userInput = new UserInput(this);
     this.userInputData = this.cache.json.get(this.levelData.initial_user_input);
     this.userInput.set_input(this.userInputData);
+  }
+
+  private addBackground(key: string) {
+    const bg = this.add.sprite(0, 0, key);
+    bg.setOrigin(0, 0);
   }
 }

@@ -4,16 +4,13 @@ import { Player } from '../prefabs/player';
 import { Door } from '../prefabs/door';
 import { NPC } from '../prefabs/npc';
 import { MsgBox } from '../prefabs/msgBox';
+import { EnemySpawner } from '../prefabs/index';
 
 export class WorldScene extends JSONLevelScene {
   private map: Phaser.Tilemaps.Tilemap;
   private tilesets: any;
   private layers: any;
-  private prefabClasses = {
-    player: Player.prototype.constructor,
-    door: Door.prototype.constructor,
-    npc: NPC.prototype.constructor
-  };
+
   public TEXT_STYLE = {
     font: '14px Kells',
     fill: '#ffffff'
@@ -22,6 +19,12 @@ export class WorldScene extends JSONLevelScene {
 
   constructor() {
     super(SCENES.WORLD);
+    this.prefabClasses = {
+      player: Player.prototype.constructor,
+      door: Door.prototype.constructor,
+      npc: NPC.prototype.constructor,
+      enemy_spawner: EnemySpawner.prototype.constructor
+    };
   }
 
   preload() {

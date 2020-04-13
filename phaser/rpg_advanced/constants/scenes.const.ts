@@ -4,3 +4,4 @@ export const BOOT = 'boot';
 export const LOADING = 'loading';
 export const WORLD = 'world';
 export const CAVE = 'cave';
+export const BATTLE = 'battle';
