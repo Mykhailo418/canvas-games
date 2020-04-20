@@ -44,16 +44,13 @@ export class BootScene extends Phaser.Scene {
   }
 
   // params come from "this.scene.start(SCENES.BOOT, {sceneName: SCENES.TITLE})"
-  create(params: {sceneName: string}): void {
-    console.log(this.cache.json.get('battle'));
+  create(params: {sceneName: string, extra_parameters: any}): void {
     const levelData = this.cache.json.get(params.sceneName);
     this.scene.start(SCENES.LOADING, {
       levelData,
-      scene: this.levels[params.sceneName].key
+      scene: this.levels[params.sceneName].key,
+      extra_parameters: params.extra_parameters
     });
   }
 
-  update(): void {
-
-  }
 }

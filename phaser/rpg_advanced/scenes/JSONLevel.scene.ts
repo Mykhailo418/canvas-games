@@ -34,32 +34,37 @@ export class JSONLevelScene extends Phaser.Scene {
   update(): void {
     Object.keys(this.sprites).forEach(key => {
       const sprite = this.sprites[key];
-      sprite.update && sprite.update();
+      sprite && sprite.update && sprite.update();
     });
   }
 
   protected addGroupsOfSprites() {
-    console.log( this.scene.key, this.levelData);
     this.groups = {};
     this.levelData.groups.forEach(groupName => {
       this.groups[groupName] = this.physics.add.group();
     });
   }
 
+  public create_prefab(spriteName: string, spriteData: any): any {
+    let sprite;
+    const {type, position, properties} = spriteData;
+    if (type === 'background') {
+      sprite = this.addBackground(properties.texture);
+    } else {
+      const PrefabClass: any = this.getPrefabClass(type);
+      if (PrefabClass) {
+        sprite = new PrefabClass(this, spriteName, position, properties);
+      }
+    }
+    return sprite;
+  }
+
   protected addSprites() {
     this.sprites = {};
     if (this.levelData.sprites) {
       Object.keys(this.levelData.sprites).forEach(spriteName => {
-        const {type, position, properties} = this.levelData.sprites[spriteName];
-        if (type === 'background') {
-          this.addBackground(properties.texture);
-        } else {
-          const PrefabClass: any = this.getPrefabClass(type);
-          if (PrefabClass) {
-            let sprite = new PrefabClass(this, spriteName, position, properties);
-            console.log('this.levelData.sprites: ', sprite);
-          }
-        }
+        let sprite = this.create_prefab(spriteName, this.levelData.sprites[spriteName]);
+        this.sprites[spriteName] = sprite;
       });
     }
   }
@@ -95,5 +100,6 @@ export class JSONLevelScene extends Phaser.Scene {
   private addBackground(key: string) {
     const bg = this.add.sprite(0, 0, key);
     bg.setOrigin(0, 0);
+    return bg;
   }
 }

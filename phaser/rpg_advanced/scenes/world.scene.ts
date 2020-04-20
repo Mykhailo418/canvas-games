@@ -31,6 +31,9 @@ export class WorldScene extends JSONLevelScene {
     for (let npc_msg_name in this.levelData.npc_messages) {
       this.load.text(npc_msg_name, this.levelData.npc_messages[npc_msg_name]);
     }
+    for (let enemy_encounter_name in this.levelData.enemy_encounters) {
+        this.load.json(enemy_encounter_name, this.levelData.enemy_encounters[enemy_encounter_name]);
+    }
   }
 
   create() {

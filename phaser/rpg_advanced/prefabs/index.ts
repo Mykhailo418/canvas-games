@@ -5,3 +5,4 @@ export * from './npc';
 export * from './player';
 export * from './prefab';
 export * from './textPrefab';
+export * from './battle/unit';
