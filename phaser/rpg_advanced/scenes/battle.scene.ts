@@ -10,6 +10,7 @@ export class BattleScene extends JSONLevelScene {
   encounter: any;
   units: PriorityQueue;
   current_unit: any;
+  experience_table: any;
 
   constructor() {
     super(SCENES.BATTLE);
@@ -29,15 +30,21 @@ export class BattleScene extends JSONLevelScene {
     this.rnd = new Phaser.Math.RandomDataGenerator();
   }
 
-  init (data) {
+  init(data) {
       super.init(data);
 
       this.previous_level = data.extra_parameters.previous_level;
       this.encounter = data.extra_parameters.encounter;
   }
 
+  preload() {
+    this.load.json('experience_table', 'assets/levels/experience_table.json');
+  }
+
   create() {
     super.create();
+
+    this.experience_table = this.cache.json.get('experience_table');
 
     for (let enemy_unit_name in this.encounter.enemy_data) {
         this.create_prefab(enemy_unit_name, this.encounter.enemy_data[enemy_unit_name]);
@@ -63,6 +70,16 @@ export class BattleScene extends JSONLevelScene {
   }
 
   next_turn() {
+    if (this.groups.enemy_units.countActive() === 0) {
+      this.end_battle();
+      return;
+    }
+
+    if (this.groups.player_units.countActive() === 0) {
+      this.game_over();
+      return;
+    }
+
     this.current_unit = this.units.getHighestAndRemove();
     if (!this.current_unit) return;
     if (this.current_unit.active) {
@@ -78,4 +95,17 @@ export class BattleScene extends JSONLevelScene {
     this.scene.start(SCENES.BOOT, {sceneName: SCENES.TOWN});
   }
 
+  game_over() {
+    this.scene.start(SCENES.BOOT, {sceneName: SCENES.TITLE});
+  }
+
+  end_battle() {
+    let experience = this.encounter.reward.experience;
+
+    this.groups.player_units.chilren.each(player_unit => {
+      player_unit.receive_experience(experience / this.groups.player_units.size);
+    });
+
+    this.back_to_world();
+  }
 }
