@@ -1,6 +1,7 @@
 import * as SCENES from '../constants/scenes.const';
 import { JSONLevelScene } from './JSONLevel.scene';
-import { Prefab, Unit } from '../prefabs/index'
+import { Prefab, Unit, MenuItem, Menu, PhysicalAttackMenuItem, EnemyMenuItem, EnemyUnit, PlayerUnit,
+  RunMenuItem, MagicalAttackMenuItem } from '../prefabs/index'
 import PriorityQueue from '../plugins/PriorityQueue';
 
 export class BattleScene extends JSONLevelScene {
@@ -8,14 +9,21 @@ export class BattleScene extends JSONLevelScene {
   previous_level: any;
   encounter: any;
   units: PriorityQueue;
-  current_unit: Unit;
+  current_unit: any;
 
   constructor() {
     super(SCENES.BATTLE);
     this.prefabClasses = {
       background: Prefab.prototype.constructor,
-      player_unit: Unit.prototype.constructor,
-      enemy_unit: Unit.prototype.constructor
+      player_unit: PlayerUnit.prototype.constructor,
+      enemy_unit: EnemyUnit.prototype.constructor,
+      menu_item: MenuItem.prototype.constructor,
+      physical_attack_menu_item: PhysicalAttackMenuItem.prototype.constructor,
+      magical_attack_menu_item: MagicalAttackMenuItem.prototype.constructor,
+      run_menu_item: RunMenuItem.prototype.constructor,
+      enemy_menu_item: EnemyMenuItem.prototype.constructor,
+      inventory_menu_item: MenuItem.prototype.constructor,
+      menu: Menu.prototype.constructor,
     };
 
     this.rnd = new Phaser.Math.RandomDataGenerator();
@@ -48,7 +56,7 @@ export class BattleScene extends JSONLevelScene {
       unit.calculate_act_turn(0);
       this.units.addElement(unit);
     });
-console.log('this.units.items', this.units.items);
+
     this.next_turn();
 
     //this.sprites.warrior.act();
@@ -66,5 +74,8 @@ console.log('this.units.items', this.units.items);
     }
   }
 
+  back_to_world() {
+    this.scene.start(SCENES.BOOT, {sceneName: SCENES.TOWN});
+  }
 
 }

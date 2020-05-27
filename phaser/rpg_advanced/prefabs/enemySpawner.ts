@@ -19,7 +19,6 @@ export class EnemySpawner extends Prefab {
     this.scene.physics.add.collider(this, this.scene.groups.players, this.spawn, null, this);
 
     this.encounter = this.scene.cache.json.get(properties.encounter);
-    console.log('11111111',properties.encounter, this.encounter);
   }
 
   spawn() {

@@ -8,7 +8,7 @@ export interface UnitProperties extends PrefabProperties {
 }
 
 export class Unit extends Prefab {
-  private body_prefab: Phaser.Physics.Arcade.Body;
+  protected body_prefab: Phaser.Physics.Arcade.Body;
   stats: any;
   target_units: any;
   timed_event: any;
@@ -30,43 +30,46 @@ export class Unit extends Prefab {
     this.anims.play(`${name}_idle`);
 
     this.stats = properties.stats;
-    this.target_units = properties.target_units;
+    //this.target_units = properties.target_units;
   }
 
-  act() {
-    const target = this.choose_target();
+  // act() {
+  //   const target = this.choose_target();
+  //
+  //   const attack_coefficient = this.scene.rnd.realInRange(0.8, 1.2);
+  //   const defense_coefficient = this.scene.rnd.realInRange(0.8, 1.2);
+  //
+  //   const attack = attack_coefficient * this.stats.attack;
+  //   const defense = defense_coefficient * this.stats.defense;
+  //
+  //   let damage = Math.max(0, Math.round(attack - defense));
+  //   console.log(damage, target);
+  //   target.receive_damage(damage);
+  //
+  //   this.anims.play(`${this.name}_attack1`);
+  // }
+  //
+  // choose_target() {
+  //   let target;
+  //   let activeTargetUnits = this.scene.groups[this.target_units].countActive();
+  //   let targetIndex = this.scene.rnd.between(0, activeTargetUnits - 1);
+  //   let active_player_unit_index = 0;
+  //   this.scene.groups[this.target_units].children.each(unit => {
+  //     if (unit.active) {
+  //       if (active_player_unit_index === targetIndex) {
+  //         target = unit;
+  //       }
+  //       active_player_unit_index ++;
+  //     }
+  //   });
+  //   return target;
+  // }
 
-    const attack_coefficient = this.scene.rnd.realInRange(0.8, 1.2);
-    const defense_coefficient = this.scene.rnd.realInRange(0.8, 1.2);
-
-    const attack = attack_coefficient * this.stats.attack;
-    const defense = defense_coefficient * this.stats.defense;
-
-    let damage = Math.max(0, Math.round(attack - defense));
-    console.log(damage, target);
-    target.receive_damage(damage);
-
-    this.anims.play(`${this.name}_attack1`);
-  }
-
-  choose_target() {
-    let target;
-    let activeTargetUnits = this.scene.groups[this.target_units].countActive();
-    let targetIndex = this.scene.rnd.between(0, activeTargetUnits - 1);
-    let active_player_unit_index = 0;
-    this.scene.groups[this.target_units].children.each(unit => {
-      if (unit.active) {
-        if (active_player_unit_index === targetIndex) {
-          target = unit;
-        }
-        active_player_unit_index ++;
-      }
-    });
-    return target;
-  }
-
-  back_to_idle() {
+  back_to_idle(animation: any) {
     this.anims.play(`${this.name}_idle`);
+    if (animation.key === `${this.name}_attack1` || animation.key === `${this.name}_attack2`) {
+      this.scene.next_turn();
+    }
   }
 
   createAnimations(name: string, properties: any) {
