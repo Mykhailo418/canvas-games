@@ -8,9 +8,14 @@ export class TitleScene extends JSONLevelScene {
     super(SCENES.TITLE);
   }
 
+  preload () {
+      this.load.json('default_data', 'assets/levels/default_data.json');
+  }
+
   create() {
     //this.addBackground();
     super.create();
+    (<any>this.cache).game.party_data = this.cache.json.get('default_data');
   }
 
   /*update() {

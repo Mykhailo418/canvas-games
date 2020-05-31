@@ -16,7 +16,7 @@ export class EnemyMenuItem extends MenuItem {
   }
 
   select() {
-    this.scene.current_attack.hit(this.enemy);
     this.scene.sprites.enemy_units_menu.enable(false);
+    this.scene.current_attack.hit(this.enemy);
   }
 }

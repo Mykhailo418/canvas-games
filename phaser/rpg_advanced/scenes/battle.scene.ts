@@ -11,6 +11,7 @@ export class BattleScene extends JSONLevelScene {
   units: PriorityQueue;
   current_unit: any;
   experience_table: any;
+  game: any;
 
   constructor() {
     super(SCENES.BATTLE);
@@ -35,6 +36,7 @@ export class BattleScene extends JSONLevelScene {
 
       this.previous_level = data.extra_parameters.previous_level;
       this.encounter = data.extra_parameters.encounter;
+      this.game = (<any>this.cache).game;
   }
 
   preload() {
@@ -48,6 +50,16 @@ export class BattleScene extends JSONLevelScene {
 
     for (let enemy_unit_name in this.encounter.enemy_data) {
         this.create_prefab(enemy_unit_name, this.encounter.enemy_data[enemy_unit_name]);
+    }
+
+    for (let player_unit_name in this.game.party_data) {
+        let unit_data = this.game.party_data[player_unit_name];
+        this.sprites[player_unit_name].stats = {};
+        for (let stat_name in unit_data.stats) {
+            this.sprites[player_unit_name].stats[stat_name] = unit_data.stats[stat_name];
+        }
+        this.sprites[player_unit_name].experience = unit_data.experience;
+        this.sprites[player_unit_name].current_level = unit_data.current_level;
     }
 
     this.units = new PriorityQueue({
@@ -104,6 +116,10 @@ export class BattleScene extends JSONLevelScene {
 
     this.groups.player_units.chilren.each(player_unit => {
       player_unit.receive_experience(experience / this.groups.player_units.size);
+
+      this.game.party_data[player_unit.name].stats = player_unit.stats;
+      this.game.party_data[player_unit.name].experience = player_unit.experience;
+      this.game.party_data[player_unit.name].current_level = player_unit.current_level;
     });
 
     this.back_to_world();

@@ -9,6 +9,7 @@ import { WorldScene } from "./scenes/world.scene";
 import { BattleScene } from "./scenes/battle.scene";
 
 class Game extends Phaser.Game {
+  party_data: any;
   constructor() {
     super(config);
     this.scene.add(SCENES.BOOT, BootScene);

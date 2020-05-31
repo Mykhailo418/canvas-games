@@ -23,8 +23,10 @@ export class Menu extends Prefab {
 
   enable (isEnabled: boolean) {
     this.menu_items.forEach(menu_item => {
-      menu_item.setInteractive(isEnabled);
-      menu_item.setVisible(isEnabled);
+      if (menu_item.active) {
+        menu_item.setInteractive(isEnabled);
+        menu_item.setVisible(isEnabled);
+      }
     });
   }
 

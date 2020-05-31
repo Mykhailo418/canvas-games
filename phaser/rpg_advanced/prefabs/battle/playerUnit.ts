@@ -10,8 +10,8 @@ export interface PlayerUnitProperties extends PrefabProperties {
 
 export class PlayerUnit extends Unit {
   target_units: any;
-  experience = 0;
-  current_level = 0;
+  experience: number;
+  current_level: number;
 
   constructor(scene: any, name: string, position: any, properties: PlayerUnitProperties) {
     super(scene, name, position, properties);

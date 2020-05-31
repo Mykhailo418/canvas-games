@@ -51,4 +51,12 @@ export class EnemyUnit extends Unit {
     return target;
   }
 
+  destroy() {
+    if (this.active) {
+      let menu_item = this.scene.prefabs[this.name + '_item'];
+      menu_item.destroy();
+      super.destroy();
+    }
+  }
+
 }
