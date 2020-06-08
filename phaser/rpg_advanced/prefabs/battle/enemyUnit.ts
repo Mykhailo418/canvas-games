@@ -30,6 +30,7 @@ export class EnemyUnit extends Unit {
   }
 
   act() {
+    this.scene.sprites.show_player_unit.show(false);
     const target = this.choose_target();
 
     this.attack.hit(target);

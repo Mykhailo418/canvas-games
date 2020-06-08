@@ -12,7 +12,7 @@ export class Menu extends Prefab {
   constructor(scene: any, name: string, position: any, properties: MenuProperties) {
     super(scene, name, position, properties);
 
-
+    console.log(properties.menu_items)
     for (let menu_item_name in properties.menu_items) {
       let menu_item = this.scene.create_prefab(menu_item_name, properties.menu_items[menu_item_name]);
       this.menu_items.push(menu_item);

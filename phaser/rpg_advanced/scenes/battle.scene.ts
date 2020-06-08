@@ -1,7 +1,7 @@
 import * as SCENES from '../constants/scenes.const';
 import { JSONLevelScene } from './JSONLevel.scene';
 import { Prefab, Unit, MenuItem, Menu, PhysicalAttackMenuItem, EnemyMenuItem, EnemyUnit, PlayerUnit,
-  RunMenuItem, MagicalAttackMenuItem } from '../prefabs/index'
+  RunMenuItem, MagicalAttackMenuItem, ShowPlayerUnit, InventoryMenuItem } from '../prefabs/index'
 import PriorityQueue from '../plugins/PriorityQueue';
 
 export class BattleScene extends JSONLevelScene {
@@ -24,8 +24,9 @@ export class BattleScene extends JSONLevelScene {
       magical_attack_menu_item: MagicalAttackMenuItem.prototype.constructor,
       run_menu_item: RunMenuItem.prototype.constructor,
       enemy_menu_item: EnemyMenuItem.prototype.constructor,
-      inventory_menu_item: MenuItem.prototype.constructor,
+      inventory_menu_item: InventoryMenuItem.prototype.constructor,
       menu: Menu.prototype.constructor,
+      show_player_unit: ShowPlayerUnit.prototype.constructor,
     };
 
     this.rnd = new Phaser.Math.RandomDataGenerator();
@@ -52,8 +53,8 @@ export class BattleScene extends JSONLevelScene {
         this.create_prefab(enemy_unit_name, this.encounter.enemy_data[enemy_unit_name]);
     }
 
-    for (let player_unit_name in this.game.party_data) {
-        let unit_data = this.game.party_data[player_unit_name];
+    for (let player_unit_name in this.game.party_data.party_data) {
+        let unit_data = this.game.party_data.party_data[player_unit_name];
         this.sprites[player_unit_name].stats = {};
         for (let stat_name in unit_data.stats) {
             this.sprites[player_unit_name].stats[stat_name] = unit_data.stats[stat_name];
@@ -74,6 +75,11 @@ export class BattleScene extends JSONLevelScene {
     this.groups.enemy_units.children.each(unit => {
       unit.calculate_act_turn(0);
       this.units.addElement(unit);
+    });
+
+    (<any>this.cache).game.inventory.collect_item(this, {
+      type: "potion",
+      properties: {group: "items"}
     });
 
     this.next_turn();
@@ -120,6 +126,10 @@ export class BattleScene extends JSONLevelScene {
       this.game.party_data[player_unit.name].stats = player_unit.stats;
       this.game.party_data[player_unit.name].experience = player_unit.experience;
       this.game.party_data[player_unit.name].current_level = player_unit.current_level;
+    });
+
+    this.encounter.reward.items.forEach(item_object => {
+      (<any>this.cache).game.inventory.collect_item(this, item_object);
     });
 
     this.back_to_world();

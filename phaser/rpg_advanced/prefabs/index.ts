@@ -16,3 +16,5 @@ export * from './battle/playerUnit';
 export * from './battle/magicalAttack';
 export * from './battle/magicalAttackMenuItem';
 export * from './battle/runMenuItem';
+export * from './battle/showPlayerUnit';
+export * from './battle/inventoryMenuItem';
