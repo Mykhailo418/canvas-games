@@ -1,4 +1,5 @@
 import { Item } from './item';
+import { ItemMenuItem } from './itemMenuItem';
 
 export class Inventory {
   items = [];
@@ -18,6 +19,36 @@ export class Inventory {
         prefab: item,
         amount: 1
       };
+    }
+  }
+
+  create_menu(scene, items_menu) {
+    let item_position = {x: items_menu.x, y: items_menu.y};
+
+    for (let item_type in this.items) {
+      let item_prefab = this.items[item_type].prefab;
+      let item_amount = this.items[item_type].amount;
+      let menu_item = new ItemMenuItem(scene, `${item_type}_menu_item`,
+      {
+        x: item_position.x,
+        y: item_position.y
+      }, {
+        group: "hud",
+        texture: item_prefab.item_texture,
+        item_name: item_type,
+        amount: item_amount
+      });
+      menu_item.setOrigin(0);
+      items_menu.menu_items.push(menu_item)
+    }
+    items_menu.enable(false);
+  }
+
+  has_items() {
+    for (let item_type in this.items) {
+      if (this.items[item_type].amount > 0) {
+        return true;
+      }
     }
   }
 }

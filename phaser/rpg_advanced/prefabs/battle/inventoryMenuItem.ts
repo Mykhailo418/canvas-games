@@ -13,6 +13,9 @@ export class InventoryMenuItem extends MenuItem {
   }
 
   select() {
-    console.log('inventory')
+    if ((<any>this.scene.cache).game.inventory.has_items()) {
+      this.scene.sprites.actions_menu.enable(false);
+      this.scene.sprites.items_menu.enable(true);
+    }
   }
 }

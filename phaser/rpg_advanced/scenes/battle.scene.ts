@@ -82,6 +82,8 @@ export class BattleScene extends JSONLevelScene {
       properties: {group: "items"}
     });
 
+    (<any>this.cache).game.inventory.create_menu(this, this.sprites.items_menu);
+
     this.next_turn();
 
     //this.sprites.warrior.act();
