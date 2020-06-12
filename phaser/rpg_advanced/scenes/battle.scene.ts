@@ -79,7 +79,8 @@ export class BattleScene extends JSONLevelScene {
 
     (<any>this.cache).game.inventory.collect_item(this, {
       type: "potion",
-      properties: {group: "items"}
+      properties: {group: "items"},
+      health_power: 50
     });
 
     (<any>this.cache).game.inventory.create_menu(this, this.sprites.items_menu);

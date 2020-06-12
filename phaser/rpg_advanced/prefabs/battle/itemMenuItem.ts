@@ -17,6 +17,19 @@ export class ItemMenuItem extends MenuItem {
   }
 
   select() {
+    const cache = (<any>this.scene.cache);
+    if (cache.game.inventory.has_item(this.item_name)) {
+      this.scene.sprites.items_menu.enable(false);
 
+      cache.game.inventory.use_item(this.item_name, this.scene.current_unit);
+
+      if (!cache.game.inventory.has_item(this.item_name)) {
+        const scene = this.scene;
+        this.destroy();
+        scene.next_turn();
+      } else {
+        this.scene.next_turn();
+      }
+    }
   }
 }

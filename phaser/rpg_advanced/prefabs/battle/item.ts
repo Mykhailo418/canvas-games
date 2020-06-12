@@ -15,4 +15,8 @@ export class Item extends Prefab {
     this.item_texture = properties.item_texture;
   }
 
+  use(target: any) {
+
+  }
+
 }

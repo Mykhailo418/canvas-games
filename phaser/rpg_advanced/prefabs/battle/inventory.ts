@@ -1,10 +1,11 @@
 import { Item } from './item';
 import { ItemMenuItem } from './itemMenuItem';
+import { Potion } from './potion';
 
 export class Inventory {
   items = [];
   item_classes = {
-    potion: Item.prototype.constructor
+    potion: Potion.prototype.constructor
   };
 
   constructor() {}
@@ -50,5 +51,14 @@ export class Inventory {
         return true;
       }
     }
+  }
+
+  has_item(item_type) {
+    return this.items[item_type].amount > 0
+  }
+
+  use_item(item_type, target) {
+    this.items[item_type].prefab.use(target);
+    this.items[item_type].amount --;
   }
 }
