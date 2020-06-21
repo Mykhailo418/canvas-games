@@ -15,7 +15,7 @@ export class TitleScene extends JSONLevelScene {
   create() {
     //this.addBackground();
     super.create();
-    (<any>this.cache).game.party_data = this.cache.json.get('default_data');
+    (<any>this.cache).game.party_data = this.cache.json.get('default_data').party_data;
   }
 
   /*update() {

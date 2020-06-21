@@ -5,6 +5,7 @@ export * from './npc';
 export * from './player';
 export * from './prefab';
 export * from './textPrefab';
+export * from './equipment';
 export * from './battle/unit';
 export * from './battle/menuItem';
 export * from './battle/menu';

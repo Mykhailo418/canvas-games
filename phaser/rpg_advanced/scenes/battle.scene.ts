@@ -53,11 +53,12 @@ export class BattleScene extends JSONLevelScene {
         this.create_prefab(enemy_unit_name, this.encounter.enemy_data[enemy_unit_name]);
     }
 
-    for (let player_unit_name in this.game.party_data.party_data) {
-        let unit_data = this.game.party_data.party_data[player_unit_name];
+    for (let player_unit_name in this.game.party_data) {
+        let unit_data = this.game.party_data[player_unit_name];
         this.sprites[player_unit_name].stats = {};
         for (let stat_name in unit_data.stats) {
-            this.sprites[player_unit_name].stats[stat_name] = unit_data.stats[stat_name];
+            this.sprites[player_unit_name].stats[stat_name] = unit_data.stats[stat_name] +
+              unit_data.stats_bonus[stat_name];
         }
         this.sprites[player_unit_name].experience = unit_data.experience;
         this.sprites[player_unit_name].current_level = unit_data.current_level;

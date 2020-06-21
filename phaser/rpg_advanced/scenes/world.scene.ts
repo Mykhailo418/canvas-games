@@ -4,7 +4,7 @@ import { Player } from '../prefabs/player';
 import { Door } from '../prefabs/door';
 import { NPC } from '../prefabs/npc';
 import { MsgBox } from '../prefabs/msgBox';
-import { EnemySpawner } from '../prefabs/index';
+import { EnemySpawner, Equipment } from '../prefabs/index';
 
 export class WorldScene extends JSONLevelScene {
   private map: Phaser.Tilemaps.Tilemap;
@@ -23,7 +23,8 @@ export class WorldScene extends JSONLevelScene {
       player: Player.prototype.constructor,
       door: Door.prototype.constructor,
       npc: NPC.prototype.constructor,
-      enemy_spawner: EnemySpawner.prototype.constructor
+      enemy_spawner: EnemySpawner.prototype.constructor,
+      equipment: Equipment.prototype.constructor,
     };
   }
 
