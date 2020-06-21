@@ -29,6 +29,12 @@ export class TitleScene extends JSONLevelScene {
   //   bg.setOrigin(0, 0);
   // }
 
+  start_game() {
+    this.scene.start(SCENES.BOOT, {
+      sceneName: SCENES.TOWN
+    });
+  }
+
   login() {
     this.scene.start(SCENES.BOOT, {
       sceneName: SCENES.WORLD

@@ -85,4 +85,13 @@ export class WorldScene extends JSONLevelScene {
     this.current_message_box.destroy();
     this.userInput.set_input(this.userInputs.town_user_input);
   }
+
+  pause_game() {
+    this.scene.start(SCENES.BOOT, {
+      sceneName: SCENES.PAUSE,
+      extra_parameters: {
+        previous_level: this.levelData.level
+      }
+    });
+  }
 }

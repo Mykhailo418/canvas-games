@@ -6,3 +6,4 @@ export const WORLD = 'world';
 export const CAVE = 'cave';
 export const BATTLE = 'battle';
 export const TOWN = 'town';
+export const PAUSE = 'pause';

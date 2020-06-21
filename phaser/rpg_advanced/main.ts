@@ -8,6 +8,7 @@ import { BootScene } from "./scenes/boot.scene";
 import { LoadingScene } from "./scenes/loading.scene";
 import { WorldScene } from "./scenes/world.scene";
 import { BattleScene } from "./scenes/battle.scene";
+import { PauseScene } from "./scenes/pause.scene";
 
 class Game extends Phaser.Game {
   party_data: any;
@@ -23,6 +24,7 @@ class Game extends Phaser.Game {
     this.scene.add(SCENES.GAME, GameScene);
     this.scene.add(SCENES.WORLD, WorldScene);
     this.scene.add(SCENES.BATTLE, BattleScene);
+    this.scene.add(SCENES.PAUSE, PauseScene);
     this.scene.start(SCENES.BOOT, {
       sceneName: SCENES.TITLE
     });

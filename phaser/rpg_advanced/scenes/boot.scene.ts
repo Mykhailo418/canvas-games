@@ -32,6 +32,10 @@ export class BootScene extends Phaser.Scene {
       [SCENES.BATTLE]: {
         key: SCENES.BATTLE,
         path: 'assets/levels/battle.json'
+      },
+      [SCENES.PAUSE]: {
+        key: SCENES.PAUSE,
+        path: 'assets/levels/pause_screen.json'
       }
     }
   }
