@@ -4,6 +4,7 @@ import * as SCENES from '../constants/scenes.const';
 export interface EquipmentProperties extends PrefabProperties {
   next_level: string;
   unit_name: string;
+  texture: string;
   body_part: any;
   stat: any;
   bonus: number;
@@ -12,6 +13,7 @@ export interface EquipmentProperties extends PrefabProperties {
 export class Equipment extends Prefab {
   private body_prefab: Phaser.Physics.Arcade.Body;
   unit_name: string;
+  texture_name: string;
   body_part: any;
   stat: any;
   bonus: number;
@@ -25,6 +27,7 @@ export class Equipment extends Prefab {
     this.body_part = properties.body_part;
     this.stat = properties.stat;
     this.bonus = +properties.bonus;
+    this.texture_name = properties.texture;
 
     this.body_prefab.immovable = true;
     this.body_prefab.setSize(this.width * this.scaleX, this.height * this.scaleY);
@@ -37,7 +40,10 @@ export class Equipment extends Prefab {
     const unit_data = cache.game.party_data[this.unit_name];
 
     if (unit_data.equipment[this.body_part].name !== this.name) {
-      unit_data.equipment[this.body_part] = {name: this.name};
+      unit_data.equipment[this.body_part] = {
+        name: this.name,
+        texture: this.texture_name
+      };
       unit_data.stats_bonus[this.stat] = this.bonus;
       this.destroy();
     }

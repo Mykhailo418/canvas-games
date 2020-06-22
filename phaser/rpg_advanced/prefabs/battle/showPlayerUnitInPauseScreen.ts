@@ -19,6 +19,8 @@ export class ShowPlayerUnitInPauseScreen extends ShowPlayerUnit {
   show_unit_defense: any;
   show_unit_magic_attack: any;
   show_unit_speed: any;
+  show_unit_head_text: any;
+  show_unit_head_texture: any;
   level_text: any;
 
   constructor(scene: any, name: string, position: any, properties: ShowPlayerUnitInPauseProperties) {
@@ -26,11 +28,22 @@ export class ShowPlayerUnitInPauseScreen extends ShowPlayerUnit {
 
     const cache: any = this.scene.cache;
     let prefab_data = cache.game.party_data[properties.prefab];
+    this.setupEquipmentToShow(prefab_data, properties.text_style);
     this.setupStatsToShow(prefab_data, properties.text_style);
 
     let level = prefab_data.current_level + 1;
     this.level_text = this.scene.add.text(this.x + 130, this.y + 100, `Level: \n ${level}`, properties.text_style);
     this.level_text.setOrigin(0);
+  }
+
+  private setupEquipmentToShow(prefab_data: any, text_style: any) {
+    let head_equipment = prefab_data.equipment.head;
+    let head_texture = head_equipment.texture ?  head_equipment.texture : undefined;
+    this.show_unit_head_text = this.scene.add.text(this.x + 250, this.y, `Head:`, text_style);
+    this.show_unit_head_texture = this.scene.add.sprite(this.x + 250, this.y + 20, head_texture);
+    this.show_unit_head_text.setOrigin(0);
+    this.show_unit_head_texture.setOrigin(0);
+    this.show_unit_head_texture.setScale(0.3);
   }
 
   private setupStatsToShow(prefab_data: any, text_style: any) {
