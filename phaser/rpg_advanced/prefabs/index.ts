@@ -20,3 +20,4 @@ export * from './battle/magicalAttackMenuItem';
 export * from './battle/runMenuItem';
 export * from './battle/showPlayerUnit';
 export * from './battle/inventoryMenuItem';
+export * from './battle/showPlayerUnitInPauseScreen';

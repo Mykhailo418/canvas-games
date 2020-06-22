@@ -1,6 +1,7 @@
 import * as SCENES from '../constants/scenes.const';
 import { JSONLevelScene } from './JSONLevel.scene';
 import { UnitStats } from '../prefabs/unitStats.ts';
+import { ShowPlayerUnitInPauseScreen } from '../prefabs/index'
 
 export class PauseScene extends JSONLevelScene {
   private bg_asset = "background_image";
@@ -10,7 +11,8 @@ export class PauseScene extends JSONLevelScene {
     super(SCENES.PAUSE);
 
     this.prefabClasses = {
-      unit_stats: UnitStats.prototype.constructor
+      unit_stats: UnitStats.prototype.constructor,
+      show_player_unit: ShowPlayerUnitInPauseScreen.prototype.constructor
     }
   }
 
@@ -40,7 +42,7 @@ export class PauseScene extends JSONLevelScene {
   }
 
   back_to_world() {
-    this.scene.start(SCENES.BOOT, {sceneName: SCENES.TOWN});
+    this.scene.start(SCENES.BOOT, {sceneName: SCENES.WORLD});
   }
 
 }
