@@ -1,4 +1,5 @@
 import "phaser";
+import * as firebase from 'firebase';
 import { config } from './config';
 import { Inventory } from './prefabs/battle/inventory';
 import * as SCENES from './constants/scenes.const';
@@ -9,6 +10,7 @@ import { LoadingScene } from "./scenes/loading.scene";
 import { WorldScene } from "./scenes/world.scene";
 import { BattleScene } from "./scenes/battle.scene";
 import { PauseScene } from "./scenes/pause.scene";
+import { firebaseConfig } from "./firebase_config";
 
 class Game extends Phaser.Game {
   party_data: any;
@@ -33,4 +35,5 @@ class Game extends Phaser.Game {
 
 window.addEventListener("load", () => {
   const game = new Game();
+  firebase.initializeApp(firebaseConfig);
 });

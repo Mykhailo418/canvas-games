@@ -1,4 +1,7 @@
-  import { Prefab, PrefabProperties } from "./prefab";
+import * as firebase from 'firebase';
+import 'firebase/auth';
+import 'firebase/database';
+import { Prefab, PrefabProperties } from "./prefab";
 import * as SCENES from '../constants/scenes.const';
 
 export interface EquipmentProperties extends PrefabProperties {
@@ -45,6 +48,11 @@ export class Equipment extends Prefab {
         texture: this.texture_name
       };
       unit_data.stats_bonus[this.stat] = this.bonus;
+
+      firebase.database()
+        .ref('users/' + firebase.auth().currentUser.uid + '/party_data')
+        .set(cache.game.party_data);
+
       this.destroy();
     }
   }

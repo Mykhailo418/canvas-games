@@ -1,7 +1,10 @@
+import * as firebase from 'firebase';
+import 'firebase/auth';
+import 'firebase/database';
 import * as SCENES from '../constants/scenes.const';
 import { JSONLevelScene } from './JSONLevel.scene';
 import { Prefab, Unit, MenuItem, Menu, PhysicalAttackMenuItem, EnemyMenuItem, EnemyUnit, PlayerUnit,
-  RunMenuItem, MagicalAttackMenuItem, ShowPlayerUnit, InventoryMenuItem } from '../prefabs/index'
+  RunMenuItem, MagicalAttackMenuItem, ShowPlayerUnit, InventoryMenuItem, BossUnit } from '../prefabs/index'
 import PriorityQueue from '../plugins/PriorityQueue';
 
 export class BattleScene extends JSONLevelScene {
@@ -19,6 +22,7 @@ export class BattleScene extends JSONLevelScene {
       background: Prefab.prototype.constructor,
       player_unit: PlayerUnit.prototype.constructor,
       enemy_unit: EnemyUnit.prototype.constructor,
+      boss_unit: BossUnit.prototype.constructor,
       menu_item: MenuItem.prototype.constructor,
       physical_attack_menu_item: PhysicalAttackMenuItem.prototype.constructor,
       magical_attack_menu_item: MagicalAttackMenuItem.prototype.constructor,
@@ -80,8 +84,11 @@ export class BattleScene extends JSONLevelScene {
 
     (<any>this.cache).game.inventory.collect_item(this, {
       type: "potion",
-      properties: {group: "items"},
-      health_power: 50
+      properties: {
+        group: "items",
+        item_texture: "potion_image",
+        health_power: 50
+      }
     });
 
     (<any>this.cache).game.inventory.create_menu(this, this.sprites.items_menu);
@@ -136,6 +143,9 @@ export class BattleScene extends JSONLevelScene {
       (<any>this.cache).game.inventory.collect_item(this, item_object);
     });
 
-    this.back_to_world();
+    firebase.database()
+      .ref('users/' + firebase.auth().currentUser.uid + '/party_data')
+      .set((<any>this.cache).game.party_data)
+      .then(this.back_to_world.bind(this));
   }
 }
